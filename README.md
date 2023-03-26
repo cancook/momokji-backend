@@ -2,7 +2,7 @@
 
 ## feat
 _**[100%] 만개의 레시피**_
-1. 음식에 대한 재료 정보를 가져올 수 있음 [만개의 레시피]("https://www.10000recipe.com/recipe/997206") EX) **1큰숟갈**
+1. 음식에 대한 재료 정보를 가져올 수 있음 [만개의 레시피](https://www.10000recipe.com/recipe/997206) EX) **1큰숟갈**
 ***
 _**[100%] 공공 데이터**_
 1. 재료에 대한 데이터가 있고, 조리 방법 및 사진이 존재 [공공데이터](http://www.foodsafetykorea.go.kr/api/openApiInfo.do?menu_grp=MENU_GRP31&menu_no=661&show_cnt=10&start_idx=1&svc_no=COOKRCP01)
