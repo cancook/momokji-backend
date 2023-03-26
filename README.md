@@ -26,6 +26,9 @@ _**[100%] 공공 데이터 - 식품의약품안전처 | 조리식품의 레시�
 |재료정보|만드는법_01|만드는법_이미지_01|
 |:---|:---|:---|
 |**채소준비** 애호박 30g(1/6개), 표고버섯 20g(2개), 당근 5g(3×2×1cm) 누룽지 죽 누룽지 70g(1/3컵), 순두부 100g(1/4모), 달걀 50g(1개),참기름 3g(2/3작은술), 소금 약간, 참깨 약간, 흰 후추 약간|1. 깨끗이 씻어 손질한 애호박, 당근과 기둥을 뗀 표고버섯을 잘게 다지듯이 썬다.a|http://www.foodsafetykorea.go.kr/uploadimg/cook/20_00016_1.png|2. 누룽지는 1cm 정도로 잘게 부숴준다.b|
+
+<img width="746" alt="스크린샷 2023-03-26 오후 4 21 32" src="https://user-images.githubusercontent.com/47213853/227761517-c2b71030-aef2-4e51-af05-6fde4ab550a6.png">
+
 ***
 [] 해먹남녀
 1. https://github.com/dudcheol/ReCook -> https://twitter.com/haemukja?lang=en
