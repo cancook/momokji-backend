@@ -10,6 +10,7 @@ packages = [{include = "self_dining_backend"}]
 python = "^3.10"
 django = "^4.1.7"
 pytube = "^12.1.3"
+ipykernel = "^6.22.0"
 
 
 [build-system]
