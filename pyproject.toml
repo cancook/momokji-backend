@@ -9,6 +9,7 @@ packages = [{include = "self_dining_backend"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 django = "^4.1.7"
+pytube = "^12.1.3"
 
 
 [build-system]
