@@ -79,9 +79,49 @@ class YouTube():
 
         df=pd.DataFrame(stats_list)
         df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/백종원_쿠킹로그.csv")
-    
+
     def simple_cooking(self):
-        return 
+        stats_dict = {}
+        stats_list = []
+        next_page_token = None
+        
+        while True:
+            res = self.youtube.search().list(
+                part='id',
+                channelId='UCC9pQY_uaBSa0WOpMNJHbEQ',
+                maxResults=50,
+                pageToken=next_page_token,
+                type='video'
+            ).execute()
+            
+            video_ids = []
+            for item in res['items']:
+                video_ids.append(item['id']['videoId'])
+            
+            # API를 사용하여 동영상의 정보를 가져옵니다.
+            video_details_res = self.youtube.videos().list(
+                part='id,snippet,statistics',
+                id=','.join(video_ids),
+                maxResults=50,
+            ).execute()
+            
+            for video in video_details_res['items']:
+                url_pk=video['id']
+                title=video['snippet']['title']
+                description=video['snippet']['description']
+                view_count=video['statistics'].get('viewCount',0)
+                like_count=video['statistics'].get('likeCount',0)
+                published=video['snippet']['publishedAt']
+                stats_dict=dict(url_pk=url_pk, title=title, description=description, published=published, view_count=view_count, like_count=like_count)
+                stats_list.append(stats_dict)
+            
+            next_page_token = res.get('nextPageToken')
+            
+            if next_page_token is None:
+                break
+
+        df=pd.DataFrame(stats_list)
+        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/자취요리신.csv")
 
 
 if __name__ == '__main__':
