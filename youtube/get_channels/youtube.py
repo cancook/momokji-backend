@@ -12,7 +12,7 @@ class YouTube():
 
     def paik_jong_won(self):
         response_channel = self.youtube.search().list(
-            q="백종원 PAIK JONG WON", # 채널 검색
+            channelId="UCyn-K7rZLXjGl7VXGweIlcA", # 채널 검색
             part="snippet",
             maxResults=50,
         ).execute()
