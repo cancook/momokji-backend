@@ -1,4 +1,5 @@
 import os
+import argparse
 import pandas as pd
 from googleapiclient.discovery import build
 
@@ -125,5 +126,13 @@ class YouTube():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='you must choose 백종원 and 자취요리신')
+    parser.add_argument('-c', '--channel')
+    args = parser.parse_args()
+
     y = YouTube()
-    y.paik_jong_won()
+
+    if args.channel == '백종원':
+        y.paik_jong_won()
+    elif args.channel == '자취요리신':
+        y.simple_cooking()
