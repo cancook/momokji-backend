@@ -1,12 +1,14 @@
 import os
 import argparse
+import sqlalchemy as sa
 import pandas as pd
 from googleapiclient.discovery import build
+from sshtunnel import SSHTunnelForwarder
 
 
 class YouTube():
     def __init__(self):
-        DEVELOPER_KEY = os.getenv('GOOGLE_DEVELOPER_KEY')
+        DEVELOPER_KEY = os.getenv('DEVELOPER_KEY')
         YOUTUBE_API_SERVICE_NAME='youtube'
         YOUTUBE_API_VERSION='v3'
         self.youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=DEVELOPER_KEY)
@@ -79,7 +81,12 @@ class YouTube():
                 stats_list.append(stats_dict)
 
         df=pd.DataFrame(stats_list)
-        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/백종원_쿠킹로그.csv")
+        df.to_sql(
+            name="youtube_youtube", 
+            schema='public',
+            if_exists='append',
+            con=engine, 
+            index=False)
 
     def simple_cooking(self):
         stats_dict = {}
@@ -107,6 +114,8 @@ class YouTube():
             ).execute()
             
             for video in video_details_res['items']:
+                # 썸네일 추가 저장
+                # 채널 값 추가 저장
                 url_pk=video['id']
                 title=video['snippet']['title']
                 description=video['snippet']['description']
@@ -122,10 +131,31 @@ class YouTube():
                 break
 
         df=pd.DataFrame(stats_list)
-        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/자취요리신.csv")
+        df.to_sql(
+            name="youtube_youtube", 
+            schema='public',
+            if_exists='append',
+            con=engine, 
+            index=False)
 
 
 if __name__ == '__main__':
+    server = SSHTunnelForwarder(
+        (os.getenv('AWS_EC2_IP'), 22),
+        ssh_username=os.getenv('AWS_EC2_USERNAME'),
+        ssh_pkey='~/.ssh/8th-team2.pem',
+        remote_bind_address=(
+            os.getenv('POSTGRES_HOST'), 5432
+        )
+    )
+    server.stop()
+    server.start()
+
+    postgres_password = os.getenv('POSTGRES_PASSWORD')
+    postgres_port = server.local_bind_port
+
+    engine = sa.create_engine(f"postgresql://postgres:{postgres_password}@localhost:{postgres_port}/postgres")
+
     parser = argparse.ArgumentParser(description='you must choose 백종원 and 자취요리신')
     parser.add_argument('-c', '--channel')
     args = parser.parse_args()
