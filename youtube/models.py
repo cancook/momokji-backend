@@ -11,8 +11,10 @@ class BaseModel(models.Model):
 
 class YouTube(models.Model):
     url_pk = models.CharField(max_length=64)
+    channel_id = models.CharField(max_length=64)
     title = models.CharField(max_length=255)
     description = models.TextField()
+    thumbnails = models.URLField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
     published = models.DateTimeField(auto_now_add=True)

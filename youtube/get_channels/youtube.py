@@ -1,5 +1,6 @@
 import os
 import argparse
+import psycopg2
 import sqlalchemy as sa
 import pandas as pd
 from googleapiclient.discovery import build
@@ -72,12 +73,14 @@ class YouTube():
 
             for video in response_videos['items']:
                 url_pk=video['id']
+                channel_id='UCyn-K7rZLXjGl7VXGweIlcA'
                 title=video['snippet']['title']
                 description=video['snippet']['description']
+                thumbnails=video['snippet']['thumbnails']['high']
                 view_count=video['statistics'].get('viewCount',0)
                 like_count=video['statistics'].get('likeCount',0)
                 published=video['snippet']['publishedAt']
-                stats_dict=dict(url_pk=url_pk, title=title, description=description, published=published, view_count=view_count, like_count=like_count)
+                stats_dict=dict(url_pk=url_pk, channel_id=channel_id, title=title, description=description, thumbnails=thumbnails, published=published, view_count=view_count, like_count=like_count)
                 stats_list.append(stats_dict)
 
         df=pd.DataFrame(stats_list)
@@ -117,12 +120,14 @@ class YouTube():
                 # 썸네일 추가 저장
                 # 채널 값 추가 저장
                 url_pk=video['id']
+                channel_id='UCC9pQY_uaBSa0WOpMNJHbEQ'
                 title=video['snippet']['title']
                 description=video['snippet']['description']
+                thumbnails=video['snippet']['thumbnails']['high']
                 view_count=video['statistics'].get('viewCount',0)
                 like_count=video['statistics'].get('likeCount',0)
                 published=video['snippet']['publishedAt']
-                stats_dict=dict(url_pk=url_pk, title=title, description=description, published=published, view_count=view_count, like_count=like_count)
+                stats_dict=dict(url_pk=url_pk, channel_id=channel_id, title=title, description=description, thumbnails=thumbnails, published=published, view_count=view_count, like_count=like_count)
                 stats_list.append(stats_dict)
             
             next_page_token = res.get('nextPageToken')
@@ -140,6 +145,10 @@ class YouTube():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='you must choose 백종원 and 자취요리신')
+    parser.add_argument('-c', '--channel')
+    args = parser.parse_args()
+
     server = SSHTunnelForwarder(
         (os.getenv('AWS_EC2_IP'), 22),
         ssh_username=os.getenv('AWS_EC2_USERNAME'),
@@ -154,11 +163,7 @@ if __name__ == '__main__':
     postgres_password = os.getenv('POSTGRES_PASSWORD')
     postgres_port = server.local_bind_port
 
-    engine = sa.create_engine(f"postgresql://postgres:{postgres_password}@localhost:{postgres_port}/postgres")
-
-    parser = argparse.ArgumentParser(description='you must choose 백종원 and 자취요리신')
-    parser.add_argument('-c', '--channel')
-    args = parser.parse_args()
+    engine = sa.create_engine(f"postgresql://postgres:{postgres_password}@localhost:{postgres_port}", pool_pre_ping=True)
 
     y = YouTube()
 
