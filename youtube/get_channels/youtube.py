@@ -1,6 +1,6 @@
 import os
-import argparse
 import psycopg2
+import argparse
 import sqlalchemy as sa
 import pandas as pd
 from googleapiclient.discovery import build
@@ -73,7 +73,7 @@ class YouTube():
 
             for video in response_videos['items']:
                 url_pk=video['id']
-                channel_id='UCyn-K7rZLXjGl7VXGweIlcA'
+                channel_id=video['snippet']['channelId'] # 'UCyn-K7rZLXjGl7VXGweIlcA'
                 title=video['snippet']['title']
                 description=video['snippet']['description']
                 thumbnails=video['snippet']['thumbnails']['high']
@@ -85,10 +85,10 @@ class YouTube():
 
         df=pd.DataFrame(stats_list)
         df.to_sql(
-            name="youtube_youtube", 
+            name="youtube_youtube",
             schema='public',
             if_exists='append',
-            con=engine, 
+            con=conn, 
             index=False)
 
     def simple_cooking(self):
@@ -117,10 +117,8 @@ class YouTube():
             ).execute()
             
             for video in video_details_res['items']:
-                # 썸네일 추가 저장
-                # 채널 값 추가 저장
                 url_pk=video['id']
-                channel_id='UCC9pQY_uaBSa0WOpMNJHbEQ'
+                channel_id=video['snippet']['channelId'] # 'UCC9pQY_uaBSa0WOpMNJHbEQ'
                 title=video['snippet']['title']
                 description=video['snippet']['description']
                 thumbnails=video['snippet']['thumbnails']['high']
@@ -140,7 +138,7 @@ class YouTube():
             name="youtube_youtube", 
             schema='public',
             if_exists='append',
-            con=engine, 
+            con=conn, 
             index=False)
 
 
@@ -149,25 +147,37 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--channel')
     args = parser.parse_args()
 
-    server = SSHTunnelForwarder(
+    with SSHTunnelForwarder(
         (os.getenv('AWS_EC2_IP'), 22),
         ssh_username=os.getenv('AWS_EC2_USERNAME'),
         ssh_pkey='~/.ssh/8th-team2.pem',
         remote_bind_address=(
             os.getenv('POSTGRES_HOST'), 5432
         )
-    )
-    server.stop()
-    server.start()
+    ) as tunnel:
+        if tunnel.is_active:
+            print("SSH 터널이 성공적으로 연결되었습니다.")
+        else:
+            print("SSH 터널 연결에 실패하였습니다.")
 
-    postgres_password = os.getenv('POSTGRES_PASSWORD')
-    postgres_port = server.local_bind_port
+        conn = psycopg2.connect(
+            host='127.0.0.1', 
+            user='postgres', 
+            password=os.getenv('POSTGRES_PASSWORD'), 
+            database='postgres', 
+            port=tunnel.local_bind_port
+            )
+        
+        if conn.status == psycopg2.extensions.STATUS_READY:
+            print("PostgreSQL에 성공적으로 연결되었습니다.")
+        else:
+            print("PostgreSQL 연결에 실패하였습니다.")
 
-    engine = sa.create_engine(f"postgresql://postgres:{postgres_password}@localhost:{postgres_port}", pool_pre_ping=True)
+        # engine = sa.create_engine(f"postgresql://postgres:{postgres_password}@localhost:{postgres_port}", pool_pre_ping=True)
 
-    y = YouTube()
+        y = YouTube()
 
-    if args.channel == '백종원':
-        y.paik_jong_won()
-    elif args.channel == '자취요리신':
-        y.simple_cooking()
+        if args.channel == '백종원':
+            y.paik_jong_won()
+        elif args.channel == '자취요리신':
+            y.simple_cooking()
