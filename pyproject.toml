@@ -22,6 +22,7 @@ discord-webhook = "^1.1.0"
 sqlalchemy= "^1.4.48"
 psycopg2-binary = "^2.9.6"
 sshtunnel = "^0.4.0"
+slack-sdk = "^3.21.3"
 
 
 [build-system]
