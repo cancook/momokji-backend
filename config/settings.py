@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
+from sshtunnel import SSHTunnelForwarder
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'youtube',
 ]
 
 MIDDLEWARE = [
@@ -70,13 +73,26 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+# # SSH
+server = SSHTunnelForwarder(
+    (os.getenv('AWS_EC2_IP'), 22),
+    ssh_username=os.getenv('AWS_EC2_USERNAME'),
+    ssh_pkey='~/.ssh/8th-team2.pem',
+    remote_bind_address=(
+        os.getenv('POSTGRES_HOST'), 5432
+    )
+)
+server.stop()
+server.start()
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': '127.0.0.1',
+        'NAME': os.getenv('POSTGRES_NAME'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'PORT': server.local_bind_port,
     }
 }
 
