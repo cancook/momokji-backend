@@ -1,13 +1,21 @@
 import os
-import psycopg2
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
+import django
+django.setup()
+
 import argparse
-import sqlalchemy as sa
 import pandas as pd
-from googleapiclient.discovery import build
+import sqlalchemy as sa
+from slack_sdk import WebClient
+from django.db import IntegrityError
 from sshtunnel import SSHTunnelForwarder
+from googleapiclient.discovery import build
+
+from youtube.models import YouTube
 
 
-class YouTube():
+class YouTubes():
     def __init__(self):
         DEVELOPER_KEY = os.getenv('DEVELOPER_KEY')
         YOUTUBE_API_SERVICE_NAME='youtube'
@@ -70,7 +78,7 @@ class YouTube():
                 part="snippet,contentDetails,statistics",
                 id=video_list[i:i+50]
             ).execute()
-
+            # ! 백종원
             for video in response_videos['items']:
                 url_pk=video['id']
                 channel_id=video['snippet']['channelId'] # 'UCyn-K7rZLXjGl7VXGweIlcA'
@@ -84,12 +92,22 @@ class YouTube():
                 stats_list.append(stats_dict)
 
         df=pd.DataFrame(stats_list)
-        df.to_sql(
-            name="youtube_youtube",
-            schema='public',
-            if_exists='append',
-            con=conn, 
-            index=False)
+        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/백종원_쿠킹로그.csv", index=False)
+
+        obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
+        try:
+            YouTube.objects.bulk_create(obj_list, ignore_conflicts=True)
+            count = YouTube.objects.filter(channel_id='UCyn-K7rZLXjGl7VXGweIlcA').count()
+            client.chat_postMessage(
+                channel="youtube",
+                text=f"백종원 데이터를 가져오는데 성공했습니다.\n현제 데이터: {count} :tada: "
+            )
+        except IntegrityError:
+            client.chat_postMessage(
+                channel="youtube", 
+                text=f"백종원 데이터를 가져오는데 실패했습니다.\n현제 데이터: {count} :red_circle: "
+            )
+
 
     def simple_cooking(self):
         stats_dict = {}
@@ -115,7 +133,7 @@ class YouTube():
                 id=','.join(video_ids),
                 maxResults=50,
             ).execute()
-            
+            # ! 자취요리신
             for video in video_details_res['items']:
                 url_pk=video['id']
                 channel_id=video['snippet']['channelId'] # 'UCC9pQY_uaBSa0WOpMNJHbEQ'
@@ -134,15 +152,27 @@ class YouTube():
                 break
 
         df=pd.DataFrame(stats_list)
-        df.to_sql(
-            name="youtube_youtube", 
-            schema='public',
-            if_exists='append',
-            con=conn, 
-            index=False)
+        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/자취요리신.csv", index=False)
+
+        obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
+        try:
+            YouTube.objects.bulk_create(obj_list, ignore_conflicts=True)
+            count = YouTube.objects.filter(channel_id='UCC9pQY_uaBSa0WOpMNJHbEQ').count()
+            client.chat_postMessage(
+                channel="youtube",
+                text=f"자취요리신 데이터를 가져오는데 성공했습니다.\n현제 데이터: {count} :tada: "
+            )
+        except IntegrityError:
+            client.chat_postMessage(
+                channel="youtube", 
+                text=f"자취요리신 데이터를 가져오는데 실패했습니다.\n현제 데이터: {count} :red_circle: "
+            )
 
 
 if __name__ == '__main__':
+    slack_token = os.getenv('SLACK_TOKEN')
+    client = WebClient(token=slack_token)
+
     parser = argparse.ArgumentParser(description='you must choose 백종원 and 자취요리신')
     parser.add_argument('-c', '--channel')
     args = parser.parse_args()
@@ -156,26 +186,14 @@ if __name__ == '__main__':
         )
     ) as tunnel:
         if tunnel.is_active:
-            print("SSH 터널이 성공적으로 연결되었습니다.")
+            print("AWS EC2 SSH 터널이 성공적으로 연결되었습니다.")
         else:
-            print("SSH 터널 연결에 실패하였습니다.")
+            print("AWS EC2 SSH 터널 연결에 실패하였습니다.")
 
-        conn = psycopg2.connect(
-            host='127.0.0.1', 
-            user='postgres', 
-            password=os.getenv('POSTGRES_PASSWORD'), 
-            database='postgres', 
-            port=tunnel.local_bind_port
-            )
-        
-        if conn.status == psycopg2.extensions.STATUS_READY:
-            print("PostgreSQL에 성공적으로 연결되었습니다.")
-        else:
-            print("PostgreSQL 연결에 실패하였습니다.")
+        postgres_password = os.getenv('POSTGRES_PASSWORD')
+        postgres_port = tunnel.local_bind_port # * 외부에서는 5432, 내부에서는 랜덤으로 할당되는 포트번호
 
-        # engine = sa.create_engine(f"postgresql://postgres:{postgres_password}@localhost:{postgres_port}", pool_pre_ping=True)
-
-        y = YouTube()
+        y = YouTubes()
 
         if args.channel == '백종원':
             y.paik_jong_won()
