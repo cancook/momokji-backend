@@ -5,6 +5,7 @@
 2. AWS EC2, RDS 생성 완료
 3. YouTube Data 백종원, 자취요리신 데이터 RDS 저장 완료
 4. Pandas to_csv 로 csv 파일 생성 완료
+5. 가비아 도메인 구매 완료 self-dining.shop
 
 ## TODO
 1. AWS EC2
