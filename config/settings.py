@@ -74,6 +74,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # # SSH
+# ! AWS EC2 에서는 주석처리
 server = SSHTunnelForwarder(
     (os.getenv('AWS_EC2_IP'), 22),
     ssh_username=os.getenv('AWS_EC2_USERNAME'),
@@ -88,11 +89,17 @@ server.start()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        # ! 로컬 환경에서는 아래와 같이 설정
         'HOST': '127.0.0.1',
+        # ! AWS EC2 에서는 아래와 같이 설정
+        # 'HOST': os.getenv('POSTGRES_HOST'),
         'NAME': os.getenv('POSTGRES_NAME'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        # ! 로컬 환경에서는 아래와 같이 설정
         'PORT': server.local_bind_port,
+        # ! AWS EC2 에서는 아래와 같이 설정
+        # 'PORT': 5432,
     }
 }
 
@@ -119,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko-kr'
 
 TIME_ZONE = 'UTC'
 
