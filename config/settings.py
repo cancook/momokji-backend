@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
-from sshtunnel import SSHTunnelForwarder
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -72,34 +71,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
-# # SSH
-# ! AWS EC2 에서는 주석처리
-server = SSHTunnelForwarder(
-    (os.getenv('AWS_EC2_IP'), 22),
-    ssh_username=os.getenv('AWS_EC2_USERNAME'),
-    ssh_pkey='~/.ssh/8th-team2.pem',
-    remote_bind_address=(
-        os.getenv('POSTGRES_HOST'), 5432
-    )
-)
-server.stop()
-server.start()
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        # ! 로컬 환경에서는 아래와 같이 설정
-        'HOST': '127.0.0.1',
-        # ! AWS EC2 에서는 아래와 같이 설정
-        # 'HOST': os.getenv('POSTGRES_HOST'),
+        'HOST': os.getenv('POSTGRES_HOST'),
         'NAME': os.getenv('POSTGRES_NAME'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        # ! 로컬 환경에서는 아래와 같이 설정
-        'PORT': server.local_bind_port,
-        # ! AWS EC2 에서는 아래와 같이 설정
-        # 'PORT': 5432,
+        'PORT': 5432,
     }
 }
 
