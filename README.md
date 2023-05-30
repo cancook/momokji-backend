@@ -6,6 +6,40 @@
 3. YouTube Data 백종원, 자취요리신 데이터 RDS 저장 완료
 4. Pandas to_csv 로 csv 파일 생성 완료
 5. 가비아 도메인 구매 완료 self-dining.shop
+6. sshtunnel - settings.py
+   ```
+   from sshtunnel import SSHTunnelForwarder
+   # # SSH
+   # ! AWS EC2 에서는 주석처리
+   server = SSHTunnelForwarder(
+      (os.getenv('AWS_EC2_IP'), 22),
+      ssh_username=os.getenv('AWS_EC2_USERNAME'),
+      ssh_pkey='~/.ssh/8th-team2.pem',
+      remote_bind_address=(
+         os.getenv('POSTGRES_HOST'), 5432
+      )
+   )
+   server.stop()
+   server.start()
+   ```
+   ```
+   DATABASES = {
+      'default': {
+         'ENGINE': 'django.db.backends.postgresql',
+         # ! 로컬 환경에서는 아래와 같이 설정
+         'HOST': '127.0.0.1',
+         # ! AWS EC2 에서는 아래와 같이 설정
+         # 'HOST': os.getenv('POSTGRES_HOST'),
+         'NAME': os.getenv('POSTGRES_NAME'),
+         'USER': os.getenv('POSTGRES_USER'),
+         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+         # ! 로컬 환경에서는 아래와 같이 설정
+         'PORT': server.local_bind_port,
+         # ! AWS EC2 에서는 아래와 같이 설정
+         # 'PORT': 5432,
+      }
+   }
+   ```
 
 ## TODO
 1. AWS EC2
