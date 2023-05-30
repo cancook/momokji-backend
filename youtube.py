@@ -92,7 +92,7 @@ class YouTubes():
                 stats_list.append(stats_dict)
 
         df=pd.DataFrame(stats_list)
-        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/백종원_쿠킹로그.csv", index=False)
+        df.to_csv("/home/ubuntu/code/self-dining-backend/csv/백종원_쿠킹로그.csv", index=False)
 
         obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
         try:
@@ -152,7 +152,7 @@ class YouTubes():
                 break
 
         df=pd.DataFrame(stats_list)
-        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/자취요리신.csv", index=False)
+        df.to_csv("/home/ubuntu/code/self-dining-backend/csv/자취요리신.csv", index=False)
 
         obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
         try:
@@ -177,25 +177,9 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--channel')
     args = parser.parse_args()
 
-    with SSHTunnelForwarder(
-        (os.getenv('AWS_EC2_IP'), 22),
-        ssh_username=os.getenv('AWS_EC2_USERNAME'),
-        ssh_pkey='~/.ssh/8th-team2.pem',
-        remote_bind_address=(
-            os.getenv('POSTGRES_HOST'), 5432
-        )
-    ) as tunnel:
-        if tunnel.is_active:
-            print("AWS EC2 SSH 터널이 성공적으로 연결되었습니다.")
-        else:
-            print("AWS EC2 SSH 터널 연결에 실패하였습니다.")
+    y = YouTubes()
 
-        postgres_password = os.getenv('POSTGRES_PASSWORD')
-        postgres_port = tunnel.local_bind_port # * 외부에서는 5432, 내부에서는 랜덤으로 할당되는 포트번호
-
-        y = YouTubes()
-
-        if args.channel == '백종원':
-            y.paik_jong_won()
-        elif args.channel == '자취요리신':
-            y.simple_cooking()
+    if args.channel == '백종원':
+        y.paik_jong_won()
+    elif args.channel == '자취요리신':
+        y.simple_cooking()
