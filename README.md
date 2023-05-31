@@ -57,7 +57,34 @@
         postgres_password = os.getenv('POSTGRES_PASSWORD')
         postgres_port = tunnel.local_bind_port # * 외부에서는 5432, 내부에서는 랜덤으로 할당되는 포트번호
    ```
+7. I realized gunicorn
+   0. poetry add gunicorn
+   1. I am using Python Poetry so I am not using requirements.txt
+     ㄴ poetry export -f requirements.txt > requirements.txt
+     ㄴ sudo apt install python3-virtualenv
+     ㄴ virtualenv venv
+     ㄴ pip install -r requirements.txt
+   2. sudo vi /etc/systemd/system/gunicorn.service
+   ```
+   [Unit]
+   Description=gunicorn daemon
+   After=network.target
 
+   [Service]
+   User=ubuntu
+   Group=ubuntu
+   WorkingDirectory=/home/ubuntu/code/self-dining-backend
+   EnviromentFile=/home/ubuntu/.bashrc
+   ExecStart=/home/ubuntu/.local/bin/gunicorn \
+         --workers 1 \
+         --bind unix:/tmp/gunicorn.sock \
+         config.wsgi:application
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+   3. sudo systemctl daemon-reload
+   4. sudo systemctl status gunicorn-service
 ## TODO
 1. AWS EC2
    1. 내부에서 Docker 사용
