@@ -74,7 +74,7 @@
    User=ubuntu
    Group=ubuntu
    WorkingDirectory=/home/ubuntu/code/self-dining-backend
-   EnviromentFile=/home/ubuntu/.bashrc
+   EnvironmentFile=/home/ubuntu/self-dining-backend/.env
    ExecStart=/home/ubuntu/.local/bin/gunicorn \
          --workers 1 \
          --bind unix:/tmp/gunicorn.sock \
