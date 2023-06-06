@@ -85,6 +85,14 @@
    ```
    4. sudo systemctl daemon-reload
    5. sudo systemctl status gunicorn-service
+8. letsencrypt
+   1. sudo add-apt-repository ppa:certbot/certbot
+   2. sudo apt install python3-certbot-nginx
+   3. sudo vi /etc/nginx/sites-available/self-dining # 도메인 추가
+   4. sudo service nginx reload and status
+   5. sudo ufw status # 방화벽 비활성화 확인
+   6. sudo certbot --nginx -d self-dining.shop
+   
 ## TODO
 1. AWS EC2
    1. 내부에서 Docker 사용
