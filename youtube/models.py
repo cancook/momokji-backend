@@ -18,6 +18,7 @@ class YouTube(models.Model):
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
     published = models.DateTimeField(auto_now_add=True)
+    play_time = models.CharField(max_length=8)
 
     class Meta:
         constraints = [
