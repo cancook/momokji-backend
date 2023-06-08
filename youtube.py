@@ -92,7 +92,7 @@ class YouTubes():
                 stats_dict=dict(url_pk=url_pk, channel_id=channel_id, title=title, description=description, thumbnails=thumbnails, published=published, play_time=play_time, view_count=view_count, like_count=like_count)
                 stats_list.append(stats_dict)
         df=pd.DataFrame(stats_list)
-        df.to_csv("/home/ubuntu/code/self-dining-backend//csv/백종원_쿠킹로그.csv", index=False)
+        df.to_csv("/home/ubuntu/code/self-dining-backend/csv/백종원_쿠킹로그.csv", index=False)
 
         obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
         try:
@@ -143,7 +143,7 @@ class YouTubes():
                 view_count=video['statistics'].get('viewCount',0)
                 like_count=video['statistics'].get('likeCount',0)
                 published=video['snippet']['publishedAt']
-                play_time=video['contentDetails']['duration']
+                play_time=video['contentDetails']['duration'].strip('PT, S').replace('M', ':')
                 stats_dict=dict(url_pk=url_pk, channel_id=channel_id, title=title, description=description, thumbnails=thumbnails, published=published, play_time=play_time, view_count=view_count, like_count=like_count)
                 stats_list.append(stats_dict)
             
