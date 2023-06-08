@@ -2,12 +2,13 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 
 from .models import YouTube, Category
-from .serializers import 
+from .serializers import RecommendedYouTubeSerializer, CategoryListSerializer
 
-class RecommendedYoutubeViewSet(viewsets.ModelViewSet):
-    queryset = '',
-    serializer_class = ''
+class RecommendedYouTubeViewSet(viewsets.ModelViewSet):
+    queryset = YouTube.objects.all()
+    serializer_class = RecommendedYouTubeSerializer
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = ''
-    seiralizer_class = ''
+    queryset = Category.objects.prefetch_related('youtube_set').all()
+    serializer_class = CategoryListSerializer
