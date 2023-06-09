@@ -1,12 +1,23 @@
 import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
+import django
+django.setup()
+
 import argparse
 import pandas as pd
+import sqlalchemy as sa
+from slack_sdk import WebClient
+from django.db import IntegrityError
+from sshtunnel import SSHTunnelForwarder
 from googleapiclient.discovery import build
 
+from youtube.models import YouTube
 
-class YouTube():
+
+class YouTubes():
     def __init__(self):
-        DEVELOPER_KEY = os.getenv('GOOGLE_DEVELOPER_KEY')
+        DEVELOPER_KEY = os.getenv('DEVELOPER_KEY')
         YOUTUBE_API_SERVICE_NAME='youtube'
         YOUTUBE_API_VERSION='v3'
         self.youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=DEVELOPER_KEY)
@@ -67,19 +78,36 @@ class YouTube():
                 part="snippet,contentDetails,statistics",
                 id=video_list[i:i+50]
             ).execute()
-
+            # ! 백종원
             for video in response_videos['items']:
                 url_pk=video['id']
+                channel_id=video['snippet']['channelId'] # 'UCyn-K7rZLXjGl7VXGweIlcA'
                 title=video['snippet']['title']
                 description=video['snippet']['description']
+                thumbnails=video['snippet']['thumbnails']['high']
                 view_count=video['statistics'].get('viewCount',0)
                 like_count=video['statistics'].get('likeCount',0)
                 published=video['snippet']['publishedAt']
-                stats_dict=dict(url_pk=url_pk, title=title, description=description, published=published, view_count=view_count, like_count=like_count)
+                play_time=video['contentDetails']['duration'].strip('PT, S').replace('M', ':')
+                stats_dict=dict(url_pk=url_pk, channel_id=channel_id, title=title, description=description, thumbnails=thumbnails, published=published, play_time=play_time, view_count=view_count, like_count=like_count)
                 stats_list.append(stats_dict)
-
         df=pd.DataFrame(stats_list)
-        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/백종원_쿠킹로그.csv")
+        df.to_csv("/home/ubuntu/code/self-dining-backend/csv/백종원_쿠킹로그.csv", index=False)
+
+        obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
+        try:
+            YouTube.objects.bulk_create(obj_list, ignore_conflicts=True)
+            count = YouTube.objects.filter(channel_id='UCyn-K7rZLXjGl7VXGweIlcA').count()
+            client.chat_postMessage(
+                channel="youtube",
+                text=f"백종원 데이터를 가져오는데 성공했습니다.\n현제 데이터: {count} :tada: "
+            )
+        except IntegrityError:
+            client.chat_postMessage(
+                channel="youtube", 
+                text=f"백종원 데이터를 가져오는데 실패했습니다.\n현제 데이터: {count} :red_circle: "
+            )
+
 
     def simple_cooking(self):
         stats_dict = {}
@@ -101,19 +129,22 @@ class YouTube():
             
             # API를 사용하여 동영상의 정보를 가져옵니다.
             video_details_res = self.youtube.videos().list(
-                part='id,snippet,statistics',
+                part='id,snippet,statistics,contentDetails',
                 id=','.join(video_ids),
                 maxResults=50,
             ).execute()
-            
+            # ! 자취요리신
             for video in video_details_res['items']:
                 url_pk=video['id']
+                channel_id=video['snippet']['channelId'] # 'UCC9pQY_uaBSa0WOpMNJHbEQ'
                 title=video['snippet']['title']
                 description=video['snippet']['description']
+                thumbnails=video['snippet']['thumbnails']['high']
                 view_count=video['statistics'].get('viewCount',0)
                 like_count=video['statistics'].get('likeCount',0)
                 published=video['snippet']['publishedAt']
-                stats_dict=dict(url_pk=url_pk, title=title, description=description, published=published, view_count=view_count, like_count=like_count)
+                play_time=video['contentDetails']['duration'].strip('PT, S').replace('M', ':')
+                stats_dict=dict(url_pk=url_pk, channel_id=channel_id, title=title, description=description, thumbnails=thumbnails, published=published, play_time=play_time, view_count=view_count, like_count=like_count)
                 stats_list.append(stats_dict)
             
             next_page_token = res.get('nextPageToken')
@@ -122,15 +153,32 @@ class YouTube():
                 break
 
         df=pd.DataFrame(stats_list)
-        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/자취요리신.csv")
+        df.to_csv("/home/ubuntu/code/self-dining-backend/csv/자취요리신.csv", index=False)
+
+        obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
+        try:
+            YouTube.objects.bulk_create(obj_list, ignore_conflicts=True)
+            count = YouTube.objects.filter(channel_id='UCC9pQY_uaBSa0WOpMNJHbEQ').count()
+            client.chat_postMessage(
+                channel="youtube",
+                text=f"자취요리신 데이터를 가져오는데 성공했습니다.\n현제 데이터: {count} :tada: "
+            )
+        except IntegrityError:
+            client.chat_postMessage(
+                channel="youtube", 
+                text=f"자취요리신 데이터를 가져오는데 실패했습니다.\n현제 데이터: {count} :red_circle: "
+            )
 
 
 if __name__ == '__main__':
+    slack_token = os.getenv('SLACK_TOKEN')
+    client = WebClient(token=slack_token)
+
     parser = argparse.ArgumentParser(description='you must choose 백종원 and 자취요리신')
     parser.add_argument('-c', '--channel')
     args = parser.parse_args()
 
-    y = YouTube()
+    y = YouTubes()
 
     if args.channel == '백종원':
         y.paik_jong_won()

@@ -19,22 +19,24 @@ class Creator(models.Model):
 
 
 class YouTube(models.Model):
+    url_pk = models.CharField(max_length=64, unique=True)
+    channel_id = models.CharField(max_length=64)
     creator = models.ForeignKey(Creator, on_delete=models.CASCADE)
-    url_pk = models.CharField(max_length=64)
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
+    thumbnails = models.URLField(null=True, blank=True)
     view_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
     published = models.DateTimeField(auto_now_add=True)
-    # Format: 24:60:60
-    play_time = models.CharField(max_length=10)
-    thumbnail_high_url = models.CharField(max_length=64)
+    play_time = models.CharField(max_length=8)
 
     class Meta:
         db_table = 'youtube'
-
-    def __init__(self, *args, **kwargs):
-        return f"{self.url_pk}의 {self.title}"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['url_pk'],
+                name='url_pk')
+        ]
 
 
 class Category(BaseModel):
