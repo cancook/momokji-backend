@@ -24,6 +24,7 @@ psycopg2-binary = "^2.9.6"
 sshtunnel = "^0.4.0"
 slack-sdk = "^3.21.3"
 gunicorn = "^20.1.0"
+djangorestframework = "^3.14.0"
 
 
 [build-system]
