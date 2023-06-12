@@ -16,7 +16,7 @@ services:
       nginx
     ports:
       - "80:80"
-      - "433:433"
+      - "443:443"
     volumes:
       - ./nginx/self-dining:/etc/nginx/conf.d
       - ./data/certbot/conf:/etc/letsencrypt 
