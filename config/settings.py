@@ -46,8 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'youtube',
+    'search',
 
     'drf_yasg',
+
     'rest_framework',
 ]
 

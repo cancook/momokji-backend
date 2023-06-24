@@ -21,6 +21,9 @@ schema_view = get_schema_view(
     permission_classes=[permissions.AllowAny],
 )
 
+from config import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('youtube.urls')),
