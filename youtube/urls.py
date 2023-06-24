@@ -9,5 +9,6 @@ router.register('recommended-list', views.RecommendedYouTubeViewSet, basename='r
 router.register('category-list', views.CategoryViewSet, basename='category')
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('youtube/', include(router.urls)),
+    path('health_check', views.HealthCheck.as_view(), name='health_check')
 ]

@@ -10,24 +10,30 @@ class CreatorSerializer(serializers.ModelSerializer):
 
 
 class RecommendedYouTubeSerializer(serializers.ModelSerializer):
-    thumbnailURL = serializers.CharField(source='thumbnail_high_url')
+    thumbnailURL = serializers.CharField(source='thumbnails')
     playTime = serializers.CharField(source='play_time')
-    link = serializers.CharField(source='url_pk')
+    link = serializers.SerializerMethodField()
 
     class Meta:
         model = YouTube
         fields = ['id', 'thumbnailURL', 'playTime', 'link']
+    
+    def get_link(self, obj):
+        return 'https://www.youtube.com/watch?v=' + obj.url_pk
 
 class YouTubeSerializer(serializers.ModelSerializer):
-    thumbnailURL = serializers.CharField(source='thumbnail_high_url')
-    playTime = serializers.CharField(source='playTime')
+    thumbnailURL = serializers.CharField(source='thumbnails')
+    playTime = serializers.CharField(source='play_time')
     views = serializers.IntegerField(source='view_count')
-    link = serializers.CharField(source='url_pk')
-    createdAt = serializers.DateTimeField(source='created_at')
+    link = serializers.SerializerMethodField()
+    createdAt = serializers.DateTimeField(source='published')
 
     class Meta:
         model = YouTube
         fields = ['id', 'title', 'thumbnailURL', 'playTime', 'views', 'link', 'createdAt']
+    
+    def get_link(self, obj):
+        return 'https://www.youtube.com/watch?v=' + obj.url_pk
 
 
 class YoutubeAndCreatorSeiralizer(serializers.ModelSerializer):
@@ -38,7 +44,7 @@ class YoutubeAndCreatorSeiralizer(serializers.ModelSerializer):
         model = YouTube
         fields = ['video', 'creator']
 
-    def get_videio(self, obj):
+    def get_video(self, obj):
         serializer = YouTubeSerializer(obj)
         return serializer.data
     
