@@ -21,7 +21,7 @@ class Creator(models.Model):
 class YouTube(models.Model):
     url_pk = models.CharField(max_length=64, unique=True)
     channel_id = models.CharField(max_length=64)
-    creator = models.ForeignKey(Creator, on_delete=models.CASCADE)
+    creator = models.ForeignKey(Creator, on_delete=models.CASCADE, null=True, default=None)
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     thumbnails = models.URLField(null=True, blank=True)
@@ -53,8 +53,8 @@ class Category(BaseModel):
 
 # Category_Youtube 중간 테이블(중간에 따로 넣어야 할 데이터가 필요하면 생성... 뭐가 있으려나)
 class Category_Youtube(models.Model):
-    Category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    YouTube = models.ForeignKey(YouTube, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    youtube = models.ForeignKey(YouTube, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'category_youtube'
