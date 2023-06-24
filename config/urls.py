@@ -1,5 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
+
+from config import settings
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
