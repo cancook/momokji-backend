@@ -39,6 +39,15 @@ class YouTube(models.Model):
         ]
 
 
+class YouTubeIngredients(models.Model):
+    youtube = models.ForeignKey(YouTube, on_delete=models.CASCADE)
+    name = models.CharField(max_length=32, unique=True)
+    is_valid = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "youtube_ingredients"
+
+
 class Category(BaseModel):
     category_id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=128)
