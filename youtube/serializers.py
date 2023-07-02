@@ -37,28 +37,16 @@ class YouTubeSerializer(serializers.ModelSerializer):
 
 
 class YoutubeAndCreatorSeiralizer(serializers.ModelSerializer):
-    video = serializers.SerializerMethodField()
-    creator = serializers.SerializerMethodField()
+    video = YouTubeSerializer()
+    creator = CreatorSerializer()
 
     class Meta:
         model = YouTube
         fields = ['video', 'creator']
 
-    def get_video(self, obj):
-        serializer = YouTubeSerializer(obj)
-        return serializer.data
-    
-    def get_creator(self, obj):
-        serializer = CreatorSerializer(obj.creator)
-        return serializer.data
-
 class CategoryListSerializer(serializers.ModelSerializer):
-    data = serializers.SerializerMethodField()
+    data = YoutubeAndCreatorSeiralizer(many=True, source='youtube_set')
 
     class Meta:
         model = Category
         fields = ['title', 'data']
-
-    def get_data(self, obj):
-        serializer = YoutubeAndCreatorSeiralizer(obj.youtube_set.all(), many=True)
-        return serializer.data
