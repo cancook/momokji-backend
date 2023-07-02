@@ -11,12 +11,14 @@ class HealthCheck(APIView):
     def get(self, request):
         return Response(True)
 
-class RecommendedYouTubeViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class RecommendedYouTubeViewSet(mixins.ListModelMixin,
+                                viewsets.GenericViewSet):
     queryset = YouTube.objects.all()
     serializer_class = RecommendedYouTubeSerializer
     
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(mixins.ListModelMixin,
+                        viewsets.GenericViewSet):
     queryset = Category.objects.prefetch_related('youtube_set').all()
     serializer_class = CategoryListSerializer
