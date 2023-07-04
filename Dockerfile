@@ -24,6 +24,6 @@ RUN poetry install --no-root
 # copy project
 COPY . .
 
-CMD ["poetry", "run", "gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout=120"]
+CMD ["poetry", "run", "gunicorn", "config.wsgi.deploy:application", "--bind", "0.0.0.0:8000", "--timeout=120"]
 
 EXPOSE 8000
