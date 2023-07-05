@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "self-dining-backend"
+name = "cancook-backend"
 version = "0.1.0"
 description = ""
 authors = ["2044smile <2044smile@naver.com>"]

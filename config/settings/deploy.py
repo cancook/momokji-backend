@@ -4,4 +4,4 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
-STATIC_ROOT = '/home/ubuntu/code/self-dining-backend/'
+STATIC_ROOT = '/home/ubuntu/code/cancook-backend/'
