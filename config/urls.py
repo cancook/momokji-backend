@@ -16,6 +16,7 @@ schema_view = get_schema_view(
         contact=openapi.Contact(email="chinup1004@naver.com"),
         license=openapi.License(name="mit"),
     ),
+    url='https://self-dining.shop/api/',
     public=True,
     permission_classes=[permissions.AllowAny],
 )
