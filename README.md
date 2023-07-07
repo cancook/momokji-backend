@@ -1,4 +1,4 @@
-# self-dining-backend
+# cancook-backend
 
 # Introduction
 ## Main features
@@ -15,8 +15,6 @@
 ## pandas
 
 ## slack-sdk
-
-## 
 
 ## gunicorn
 
