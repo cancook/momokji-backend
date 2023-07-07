@@ -1,4 +1,4 @@
-import os
+import os, re
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 import django
@@ -22,6 +22,100 @@ class YouTubes():
         YOUTUBE_API_SERVICE_NAME='youtube'
         YOUTUBE_API_VERSION='v3'
         self.youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=DEVELOPER_KEY)
+
+    def paik_jong_won_ingredients(self):
+        ingredient_dict = {}
+        ingredient_list = []
+        target_description = None
+
+        objs = YouTube.objects.filter(channel_id="UCyn-K7rZLXjGl7VXGweIlcA").values_list('url_pk', 'description')
+        """
+        1. 유튜브 재료 데이터 저장 Model 을 만든다.
+            - YouTube <-> YouTube Ingredient
+            - YouTube(id) video OneToMany YouTube Ingredient 재료데이터
+        2. YouTube description 데이터에서 유튜브 재료 데이터 저장 Model 에 저장이 되어있는지 여부 확인
+            - 저장 되어 있다면 pass
+            - 저장 안되어 있다면 저장 bulk_create
+        3. 나무위키 데이터를 사용하지 않고, 유튜브 데이터를 계속 쌓아가는 방식으로 사용
+        """
+        for obj in objs:
+            description = obj[1].split("\n")
+            url_pk = obj[0]
+            for ingredient in description:
+                if '[ 재료 ]' in ingredient:
+                    target_description = ingredient
+                    if target_description:
+                        index = description.index(target_description)
+                        for i in range(index+1, len(description)):
+                            if description[i] == '':
+                                break
+                            if description[i].startswith('['):
+                                break
+                            if description[i].startswith('[ 만드는 법 ]'):
+                                break
+                            if description[i].startswith('*'):
+                                break
+                            if description[i] == '*':
+                                break
+
+                            ingredient = re.sub(r'[|[a-zA-Z]|[0-9]|[약컵큰술개병/()½¼¾~ .]|]', '', description[i])
+                            if (len(ingredient) > 2 and ingredient[-1] == '과') or (len(ingredient) > 2 and ingredient[-1] == '대') or (len(ingredient) > 3 and ingredient[-1] == '간'):
+                                ingredient = re.sub(r'.$', '', ingredient)
+                            if (len(ingredient) > 3 and ingredient[-1] == '장') or (len(ingredient) > 3 and ingredient[-1] == '와'):
+                                ingredient = re.sub(r'(장|와)$', '', ingredient)
+
+                            ingredient_dict = dict(url_pk=url_pk, name=ingredient)
+                            ingredient_list.append(ingredient_dict)
+            else:
+                pass
+        
+        #! YouTube Model and Ingredient Model 
+        #! Ingredients 에 데이터 'name' 을 저장하는 것은 완료 but .save() 라 bulk_create 를 하고 싶음
+        obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
+        for obj in obj_list:
+            try:
+                obj.save()
+            except IntegrityError:
+                pass
+
+        obj_ingredients = Ingredients.objects.all()
+        for obj_i in obj_ingredients:
+            obj_y = YouTube.objects.filter(description__contains=obj_i.name)
+            obj_i.youtube.set(obj_y)
+
+        # #! test m2m
+        # import pdb;
+        # pdb.set_trace()
+        # test_i = Ingredients.objects.create(name='test1', is_valid=True)
+        # test_y = YouTube.objects.get(url_pk=ingredient_list[1]['url_pk'])
+
+        # test_i.youtube.set([test_y])  #! test_i 에서 역참조 'youtube' 를 해서 test_i 에 맞는 test_y 를 매칭시킨다.
+        
+        # obj = []
+        # obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
+        # obj_list.save()
+        # obj_list = []
+            # try:
+            #     obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
+            # except IntegrityError:
+            #     print(ingredient)
+
+            # ingredient.youtube.set([info['url_pk']])
+            # obj_list.append(ingredient)
+        # try:
+        #     print(obj_list)
+        #     Ingredients.objects.bulk_create(obj_list, ignore_conflicts=True)
+        #     """
+        #         Ingredients.objects.bulk_create(ingredient_list)
+        #         - bulk_create 할 시 AutoField 가 작동하지 않아 id 가 생성되지 않음  ingredient_list[1].id = None
+        #           - 그렇게에 IntegrityError 로 넘어가고,
+        #           - #! ignore_conflicts=True 를 설정하고 DB 를 확인하면 id 값이 생성되어 있음 what the fu**
+                
+        #         1. Ingredient DB YouTube ManyToMany
+        #     """
+        # except IntegrityError:
+        #     print(obj_list)
+
 
     def paik_jong_won(self):
         response_channel = self.youtube.search().list(
@@ -93,7 +187,7 @@ class YouTubes():
                 stats_dict=dict(url_pk=url_pk, channel_id=channel_id, title=title, description=description, thumbnails=thumbnails, published=published, play_time=play_time, view_count=view_count, like_count=like_count)
                 stats_list.append(stats_dict)
         df=pd.DataFrame(stats_list)
-        df.to_csv("/home/ubuntu/code/self-dining-backend/csv/백종원_쿠킹로그.csv", index=False)
+        df.to_csv("/home/ubuntu/code/cancook-backend/csv/백종원_쿠킹로그.csv", index=False)
 
         obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
         try:
@@ -154,7 +248,7 @@ class YouTubes():
                 break
 
         df=pd.DataFrame(stats_list)
-        df.to_csv("/home/ubuntu/code/self-dining-backend/csv/자취요리신.csv", index=False)
+        df.to_csv("/home/ubuntu/code/cancook-backend/csv/자취요리신.csv", index=False)
 
         obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
         try:
@@ -191,7 +285,7 @@ if __name__ == '__main__':
     ingredient = IngredientList()
 
     if args.channel == '백종원':
-        y.paik_jong_won()
+        y.paik_jong_won_ingredients()
     elif args.channel == '자취요리신':
         y.simple_cooking()
     elif args.ingredients == '나무위키':
