@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "self-dining-backend"
+name = "cancook-backend"
 version = "0.1.0"
 description = ""
 authors = ["2044smile <2044smile@naver.com>"]
@@ -27,6 +27,7 @@ djangorestframework = "^3.14.0"
 psycopg2 = "^2.9.6"
 drf-yasg = "^1.21.6"
 django-extensions = "^3.2.3"
+django-cors-headers = "^4.1.0"
 
 
 [build-system]

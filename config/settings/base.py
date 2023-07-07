@@ -15,7 +15,7 @@ from pathlib import Path
 from environ import Env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = Env()
 env_path = BASE_DIR / ".env"
@@ -28,12 +28,6 @@ if env_path.exists():
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-+fblnkdhp78#eh0(i9r*y65b$5+qyn2hx7u-nzoivcb3770a0u'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -48,21 +42,30 @@ INSTALLED_APPS = [
     'youtube',
     'search',
 
+    # Swagger
     'drf_yasg',
 
+    # DRF
     'rest_framework',
     'django_extensions',
+
+    # CORS
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'config.urls'
 
@@ -81,8 +84,6 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
@@ -131,8 +132,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/ubuntu/code/self-dining-backend/'
-# STATIC_DIR = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = BASE_DIR / 'static/'
+STATIC_DIR = []
 
 # STATICFILES_DIRS = [
 #     STATIC_DIR,
