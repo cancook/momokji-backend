@@ -69,8 +69,6 @@ class YouTubes():
             else:
                 pass
         
-        #! YouTube Model and Ingredient Model 
-        #! Ingredients 에 데이터 'name' 을 저장하는 것은 완료 but .save() 라 bulk_create 를 하고 싶음
         obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
         for obj in obj_list:
             try:
@@ -82,40 +80,7 @@ class YouTubes():
         for obj_i in obj_ingredients:
             obj_y = YouTube.objects.filter(description__contains=obj_i.name)
             obj_i.youtube.set(obj_y)
-
-        # #! test m2m
-        # import pdb;
-        # pdb.set_trace()
-        # test_i = Ingredients.objects.create(name='test1', is_valid=True)
-        # test_y = YouTube.objects.get(url_pk=ingredient_list[1]['url_pk'])
-
-        # test_i.youtube.set([test_y])  #! test_i 에서 역참조 'youtube' 를 해서 test_i 에 맞는 test_y 를 매칭시킨다.
         
-        # obj = []
-        # obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
-        # obj_list.save()
-        # obj_list = []
-            # try:
-            #     obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
-            # except IntegrityError:
-            #     print(ingredient)
-
-            # ingredient.youtube.set([info['url_pk']])
-            # obj_list.append(ingredient)
-        # try:
-        #     print(obj_list)
-        #     Ingredients.objects.bulk_create(obj_list, ignore_conflicts=True)
-        #     """
-        #         Ingredients.objects.bulk_create(ingredient_list)
-        #         - bulk_create 할 시 AutoField 가 작동하지 않아 id 가 생성되지 않음  ingredient_list[1].id = None
-        #           - 그렇게에 IntegrityError 로 넘어가고,
-        #           - #! ignore_conflicts=True 를 설정하고 DB 를 확인하면 id 값이 생성되어 있음 what the fu**
-                
-        #         1. Ingredient DB YouTube ManyToMany
-        #     """
-        # except IntegrityError:
-        #     print(obj_list)
-
 
     def paik_jong_won(self):
         response_channel = self.youtube.search().list(
