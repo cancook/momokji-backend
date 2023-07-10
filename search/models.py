@@ -4,8 +4,7 @@ from youtube.models import BaseModel, YouTube
 
 class Ingredients(models.Model):
     name = models.CharField(unique=True, max_length=32)
-    # youtube = models.ManyToManyField(YouTube, through="Ingredients_Youtube")
-    youtube = models.ManyToManyField(YouTube, related_name="youtube")
+    youtube = models.ManyToManyField(YouTube, related_name="youtube", through="Ingredients_Youtube")
     is_valid = models.BooleanField(default=False)
 
     class Meta:
@@ -15,6 +14,6 @@ class Ingredients(models.Model):
         return f"{self.name}"
     
 
-# class Ingredients_Youtube(BaseModel): #! m2m 중간 역할
-#     ingredients = models.ForeignKey(Ingredients)
-#     youtube = models.ForeignKey(YouTube)
+class Ingredients_Youtube(models.Model):
+    ingredients = models.ForeignKey(Ingredients, on_delete=models.PROTECT)
+    youtube = models.ForeignKey(YouTube, on_delete=models.PROTECT)
