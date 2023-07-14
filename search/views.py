@@ -13,11 +13,11 @@ from .models import Ingredients, Ingredients_Youtube
 from .serializers import IngredientSerializer, IngredientYouTubeSerializer, WordValidationSerializer
 
 
-# * YouTube 에서 모든 재료 데이터를 Filtering 하고 1차 검열한 데이터를 노출
-class IngredientViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class GetIngredientDataViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Ingredients.objects.all()
     serializer_class = IngredientSerializer
-    
+
+    @swagger_auto_schema(request_body=GetIngredientDataSerializer)
     def list(self, request):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)

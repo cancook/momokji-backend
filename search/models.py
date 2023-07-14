@@ -15,5 +15,5 @@ class Ingredients(models.Model):
     
 
 class Ingredients_Youtube(models.Model):
-    ingredients = models.ForeignKey(Ingredients, on_delete=models.PROTECT)
-    youtube = models.ForeignKey(YouTube, on_delete=models.PROTECT)
+    ingredients = models.ForeignKey(Ingredients, on_delete=models.CASCADE)
+    youtube = models.ForeignKey(YouTube, on_delete=models.CASCADE)
