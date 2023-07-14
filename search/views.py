@@ -29,7 +29,8 @@ class GetIngredientDataViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             ingredient_list.append(target[0])
 
         return Response(ingredient_list, status=200)
-    
+
+
 class GetYouTubeFromIngredientViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Ingredients.objects.all()
     serializer_class = GetYouTubeFromIngredientSerializer
