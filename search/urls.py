@@ -5,8 +5,8 @@ from . import views
 app_name = 'search'
 
 router = DefaultRouter()
-router.register('ingredient-list', views.IngredientViewSet, basename='ingredient')
-router.register('ingredient-youtube-list', views.IngredientYouTubeViewSet, basename='ingredient-youtube')
+router.register('get-ingredient-data', views.GetIngredientDataViewSet, basename='ingredient')
+router.register('get-youtube-from-ingredient', views.GetYouTubeFromIngredientViewSet, basename='ingredient-youtube')
 
 urlpatterns = [
     path('search/', include(router.urls)),
