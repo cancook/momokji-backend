@@ -12,7 +12,10 @@ class GetIngredientDataSerializer(serializers.ModelSerializer):
 
 
 class WordValidationSerializer(serializers.Serializer):
-    word = serializers.CharField(help_text="단어로 검색")
+    word = serializers.ListField(
+        child=serializers.CharField(),
+        help_text="단어로 검색"
+    )
 
 
 class GetYouTubeFromIngredientSerializer(serializers.ModelSerializer):
