@@ -17,18 +17,15 @@ class GetIngredientDataViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Ingredients.objects.all()
     serializer_class = GetIngredientDataSerializer
 
+    def get_queryset(self):
+        queryset = self.queryset.values('name')
+        return queryset
+
     def list(self, request):
-        queryset = self.get_queryset()
+        queryset = self.get_queryset().values('name')
         serializer = self.get_serializer(queryset, many=True)
 
-        ingredient_list = []
-
-        validated_data = serializer.data
-        for data in validated_data:
-            target = list(data.values())
-            ingredient_list.append(target[0])
-
-        return Response(ingredient_list, status=200)
+        return Response(serializer.data, status=200)
 
 
 class GetYouTubeFromIngredientViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
