@@ -6,10 +6,7 @@ from .models import Ingredients
 
 
 class WordValidationSerializer(serializers.Serializer):
-    word = serializers.ListField(
-        child=serializers.CharField(),
-        help_text="단어로 검색"
-    )
+    word = serializers.CharField(help_text="단어로 검색")
 
 
 class GetIngredientDataSerializer(serializers.Serializer):
