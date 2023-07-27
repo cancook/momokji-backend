@@ -5,17 +5,15 @@ from youtube.models import YouTube
 from .models import Ingredients
 
 
-class GetIngredientDataSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ingredients
-        fields = ['name']
-
-
 class WordValidationSerializer(serializers.Serializer):
     word = serializers.ListField(
         child=serializers.CharField(),
         help_text="단어로 검색"
     )
+
+
+class GetIngredientDataSerializer(serializers.Serializer):
+    name = serializers.ListField(child=serializers.CharField(), help_text="재료 리스트")
 
 
 class GetYouTubeFromIngredientSerializer(serializers.ModelSerializer):
