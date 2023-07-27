@@ -28,6 +28,7 @@ psycopg2 = "^2.9.6"
 drf-yasg = "^1.21.6"
 django-extensions = "^3.2.3"
 django-cors-headers = "^4.1.0"
+django-filter = "^23.2"
 
 
 [build-system]

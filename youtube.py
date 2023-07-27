@@ -1,15 +1,13 @@
 import os, re
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.base")
 
 import django
 django.setup()
 
 import argparse
 import pandas as pd
-import sqlalchemy as sa
 from slack_sdk import WebClient
 from django.db import IntegrityError
-from sshtunnel import SSHTunnelForwarder
 from googleapiclient.discovery import build
 
 from youtube.models import YouTube
@@ -29,15 +27,7 @@ class YouTubes():
         target_description = None
 
         objs = YouTube.objects.filter(channel_id="UCyn-K7rZLXjGl7VXGweIlcA").values_list('url_pk', 'description')
-        """
-        1. 유튜브 재료 데이터 저장 Model 을 만든다.
-            - YouTube <-> YouTube Ingredient
-            - YouTube(id) video OneToMany YouTube Ingredient 재료데이터
-        2. YouTube description 데이터에서 유튜브 재료 데이터 저장 Model 에 저장이 되어있는지 여부 확인
-            - 저장 되어 있다면 pass
-            - 저장 안되어 있다면 저장 bulk_create
-        3. 나무위키 데이터를 사용하지 않고, 유튜브 데이터를 계속 쌓아가는 방식으로 사용
-        """
+
         for obj in objs:
             description = obj[1].split("\n")
             url_pk = obj[0]
@@ -69,53 +59,20 @@ class YouTubes():
             else:
                 pass
         
-        #! YouTube Model and Ingredient Model 
-        #! Ingredients 에 데이터 'name' 을 저장하는 것은 완료 but .save() 라 bulk_create 를 하고 싶음
+        #* 1. 검증 된 재료데이터(ingredient_list) 를 가져와서 Ingredient Model 에 저장한다.
         obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
-        for obj in obj_list:
-            try:
-                obj.save()
-            except IntegrityError:
-                pass
+        try:
+            Ingredients.objects.bulk_create(obj_list)
+        except IntegrityError:
+            pass
 
+        #* 2. Ingredient Model 이 저장되었고, 
+        #*    Ingredient(obj) 의 값을 기준으로 YouTube Model 매칭되는 값을 m2m 으로 연결한다.
         obj_ingredients = Ingredients.objects.all()
         for obj_i in obj_ingredients:
             obj_y = YouTube.objects.filter(description__contains=obj_i.name)
             obj_i.youtube.set(obj_y)
-
-        # #! test m2m
-        # import pdb;
-        # pdb.set_trace()
-        # test_i = Ingredients.objects.create(name='test1', is_valid=True)
-        # test_y = YouTube.objects.get(url_pk=ingredient_list[1]['url_pk'])
-
-        # test_i.youtube.set([test_y])  #! test_i 에서 역참조 'youtube' 를 해서 test_i 에 맞는 test_y 를 매칭시킨다.
         
-        # obj = []
-        # obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
-        # obj_list.save()
-        # obj_list = []
-            # try:
-            #     obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
-            # except IntegrityError:
-            #     print(ingredient)
-
-            # ingredient.youtube.set([info['url_pk']])
-            # obj_list.append(ingredient)
-        # try:
-        #     print(obj_list)
-        #     Ingredients.objects.bulk_create(obj_list, ignore_conflicts=True)
-        #     """
-        #         Ingredients.objects.bulk_create(ingredient_list)
-        #         - bulk_create 할 시 AutoField 가 작동하지 않아 id 가 생성되지 않음  ingredient_list[1].id = None
-        #           - 그렇게에 IntegrityError 로 넘어가고,
-        #           - #! ignore_conflicts=True 를 설정하고 DB 를 확인하면 id 값이 생성되어 있음 what the fu**
-                
-        #         1. Ingredient DB YouTube ManyToMany
-        #     """
-        # except IntegrityError:
-        #     print(obj_list)
-
 
     def paik_jong_won(self):
         response_channel = self.youtube.search().list(
@@ -265,13 +222,6 @@ class YouTubes():
             )
 
 
-class IngredientList():
-    def namuwiki(self):
-        ingredients = ['곡물', '쌀', '밀', '옥수수', '콩', '강낭콩', '대두', '렌틸', '병아리콩', '서리태', '완두', '풋콩', '녹두', '팥', '보리', '엿기름', '청보리', '귀리', '오트밀', '기장(식물)|기장', '수수', '율무', '조(식물)|조', '카무트', '피(식물)|피', '참깨', '호밀', '메밀', '아마란스', '견과류', '갈릭넛', '개암나무', '도토리', '땅콩', '마카다미아', '밤(열매)|밤', '브라질너트', '아마씨', '아몬드', '은행나무|은행', '잣', '캐슈넛', '피스타치오', '피칸', '해바라기씨', '헤이즐넛', '호두', '호박씨', '과일', '귤속', '딸기', '산딸기', '블랙베리', '라즈베리', '블루베리', '크랜베리', '넌출월귤', '배(과일)|배', '서양배', '키위(과일)|키위', '다래', '파인애플', '포도', '건포도', '복숭아', '천도복숭아', '감|감', '구아바', '구즈베리', '꽃사과', '대추', '대추야자', '두리안', '람부탄', '리치(과일)', '망고', '망고스틴', '매실', '머루', '멜론', '모과', '무화과', '바나나', '버찌', '앵두', '체리', '보리수', '복분자', '빵나무', '사과', '살구', '수박', '스타후르츠', '시솝', '애플망고', '옐로베리', '용과', '용안', '이리사바이', '자두', '잭프루트', '진들딸기', '참외', '코코넛', '파파야', '채소', '감자', '고구마', '고사리', '근대(채소)|근대', '당근', '돌나물', '돈나물', '무(채소)|무', '배추', '브로콜리', '상추', '아스파라거스', '양배추', '오이', '콩나물', '숙주나물', '케일', '토마토', '호박', '우엉', '연근', '마(식물)|마', '야콘', '가지(채소)|가지', '피망', '파프리카', '양파', '시금치', '부추', '미나리', '쑥갓', '고기|육류', '쇠고기', '돼지고기', '닭고기', '양고기', '오리고기', '칠면조', '비둘기', '말고기', '염소고기', '고래고기', '쥐고기', '개고기', '배양육', '가공육', '유제품', '우유', '원유', '가공우유', '치즈', '버터', '요구르트', '야쿠르트', '연유', '분유', '생크림', '휘핑크림', '사워크림', '생선', '생선|문서', '꼴뚜기', '낙지', '문어', '오징어', '쭈꾸미', '해삼', '게', '꽃게', '대게', '참게', '새우', '대하', '바닷가재', '닭새우', '조개|패각류', '꼬막', '굴(어패류)|굴', '대합', '모시조개', '바지락', '소라(동물)|소라', '전복', '재첩', '키조개', '홍합', '조류(식물)|해조류', '감태', '김(음식)|김', '다시마', '매생이', '모자반', '미역', '톳', '파래', '충식|곤충류', '누에', '번데기(음식)|번데기', '거저리', '메뚜기', '조미료', '장류', '식용유', '스프레드(식품)|스프레드', '당|당류', '설탕', '흑설탕', '사탕수수', '올리고당', '정제당', '삼온당', '황설탕', '조청', '꿀', '땅콩버터', '시럽', '메이플 시럽', '아가베 시럽', '버터스카치', '청(식재료)', '액상과당', '잼(음식)|잼', '마멀레이드', '허니버터', '타가토스', '베지마이트', '마마이트', '양념', '소스', '드레싱', '마요네즈', '랜치', '홀랜다이즈 소스', '머스터드 소스', '케첩', '케찹 마니스', '살사', '우스터 소스', '핫소스', '타바스코', '타르타르 소스', '스리라차 소스', '젓갈', '액젓', '피시소스', '멸치젓소스', '커리', '마살라', '갖은양념', '다대기', '브라운 소스', '그레이비 소스', '데미글라스 소스', '데리야키', '베샤멜 소스', '시즈닝', '참소스', '초고추장', '토마토 소스', '소금', '죽염', '토판염', '암염', '식초', '발사믹 식초', '육수', '스톡', '가쓰오부시', '후리카케', '향신료', '허브(식물)|허브', '고추', '후추', '파', '대파(식물)|대파', '쪽파', '겨자', '머스터드', '생강', '강황', '터메릭', '시나몬', '계피', '고추냉이', '마늘', '바닐라', '사프란', '깻잎', '들깨', '달래', '차조기', '회향', '커민', '소두구', '육두구', '메이스', '타마린드', '올스파이스', '산초(식물)|산초', '팔각', '정향', '귤|진피', '오신채', '색소', '치자나무|치자', '쪽', '캐러멜 색소', '화학조미료', '다시다', '사카린', '아스파탐', '자일리톨', 'MSG', '미원(조미료)|미원', '아지노모토', '수크랄로스', '산화방지제', '삼차뷰틸하이드로퀴논', '스테비오사이드', '팽창제', '베이킹 파우더', '탄산수소나트륨', '가공식품', '보존식품', '통조림', '참치통조림', '고추참치', '병조림', '식물성 고기', '대두단백', '콩고기', '밀고기', '어묵', '게맛살', '핫바', '두부', '유부', '냉동식품', '레토르트 식품', '시리얼', '만두', '참치마요', '에너지바', '두유', '아몬드밀크', '마가린', '미숫가루', '면', '국수', '파스타', '기호식품', '커피', '차', '술', '술 관련 정보', '음료', '주스', '탄산음료', '사이다', '소다', '진저에일', '콜라', '토닉워터', '이온음료', '감주', '량샤', '숙취해소제', '에너지 드링크', '초콜릿', '카카오', '카카오매스', '카카오버터', '카카오 파우더', '카카오닙스', '다크 초콜릿', '화이트 초콜릿', ':분류:초콜릿', '과자', ':분류:과자', '과자/공산품', '한과', '한국', '화과자', '일본', '풀빵', '서양', '누가', '바', '비스킷', '사탕', '스낵', '크래커', '칩', '아이스크림', ':분류:빙과류', '빵', '빵/종류', '건빵', '공갈빵', '꿀빵', '모닝빵', '바게트', '쇼트케이크', '소보로빵', '슈크림빵', '슈크림', '소라빵', '초코 콜로네', '스펀지 케이크', '시폰 케이크', '식빵', '웨딩케이크', '진저브레드', '치즈케이크', '컵케이크', '파운드 케이크', '파이(음식)|파이', '팬케이크', '핫케이크', '케이크', '쿠키', '아이스크림 케이크']
-        
-        for ingredient in ingredients:
-            Ingredients.objects.create(name=ingredient)
-
 if __name__ == '__main__':
     slack_token = os.getenv('SLACK_TOKEN')
     client = WebClient(token=slack_token)
@@ -282,11 +232,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     y = YouTubes()
-    ingredient = IngredientList()
 
     if args.channel == '백종원':
+        y.paik_jong_won()
+    elif args.channel == '백종원재료':
         y.paik_jong_won_ingredients()
     elif args.channel == '자취요리신':
         y.simple_cooking()
-    elif args.ingredients == '나무위키':
-        ingredient.namuwiki()

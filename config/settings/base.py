@@ -51,6 +51,9 @@ INSTALLED_APPS = [
 
     # CORS
     'corsheaders',
+
+    # DjangoFilter
+    'django_filters',
 ]
 
 MIDDLEWARE = [
