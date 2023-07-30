@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Case, When
+from django.db.models import Case, When, Count
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -71,26 +71,26 @@ class GetYouTubeFromIngredientViewSet(mixins.ListModelMixin, viewsets.GenericVie
     def get_queryset(self):
         serializer = GetIngredientDataSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
+        ingredient_name_list = serializer.validated_data['nameList']
 
-        word = serializer.validated_data['word']
+        queryset = YouTube.objects.prefetch_related('ingredients').filter(
+            ingredients__name__in=ingredient_name_list
+        ).annotate(
+            num_references=Count('ingredients')
+        ).order_by('-num_references')
 
-        if word:
-            queryset = self.queryset.filter(name__icontains=word).annotate(
-                starts_with=Case(
-                    When(name__istartswith=word, then=0),
-                    default=1,
-                    output_field=models.IntegerField(),
-                )
-            ).order_by('starts_with', 'name')
+        for obj in queryset:
+            if obj.num_references > 0:
+                print(obj.id)
+                
         return queryset
+    
     @swagger_auto_schema(
             query_serializer=GetIngredientDataSerializer,
             responses={200: GetYouTubeFromIngredientSerializer(many=True)}
     )
     def list(self, request):
-        queryset = Ingredients_Youtube.objects.filter(
-            ingredients_id__in=self.get_queryset().values('id')).values('youtube_id')
-        queryset = YouTube.objects.filter(id__in=queryset)
+        queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data, status=200)
