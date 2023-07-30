@@ -10,7 +10,7 @@ class WordValidationSerializer(serializers.Serializer):
 
 
 class GetIngredientDataSerializer(serializers.Serializer):
-    name = serializers.ListField(child=serializers.CharField(), help_text="재료 리스트")
+    nameList = serializers.ListField(child=serializers.CharField(), help_text="재료 리스트")
 
 
 class GetYouTubeFromIngredientSerializer(serializers.ModelSerializer):

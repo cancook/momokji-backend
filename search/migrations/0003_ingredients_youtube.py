@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ingredients',
             name='youtube',
-            field=models.ManyToManyField(to='youtube.youtube'),
+            field=models.ManyToManyField(related_name='ingredients', through='search.Ingredients_Youtube', to='youtube.youtube'),
         ),
     ]
