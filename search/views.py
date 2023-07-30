@@ -9,11 +9,30 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 from youtube.models import YouTube
-from .models import Ingredients, Ingredients_Youtube
-from .serializers import GetIngredientDataSerializer, GetYouTubeFromIngredientSerializer, WordValidationSerializer
+from .models import CategoryIngredients, Ingredients, Ingredients_Youtube
+from .serializers import GetCategoryIngredientSerializer, GetIngredientDataSerializer, GetYouTubeFromIngredientSerializer, WordValidationSerializer
 
 
-class GetIngredientDataViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class GetCategoryIngredientViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    serializer_class = GetCategoryIngredientSerializer
+
+    def get_queryset(self):
+        queryset = CategoryIngredients.objects.prefetch_related('category_ingredients').all()
+        return queryset
+    
+    @swagger_auto_schema(
+            responses={200: GetCategoryIngredientSerializer(many=True)}
+    )
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data, status=200)
+
+
+class GetIngredientDataViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    serializer_class = GetIngredientDataSerializer
+
     def get_queryset(self):
         queryset = Ingredients.objects.all()
 
@@ -30,6 +49,7 @@ class GetIngredientDataViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSe
                 )
             ).order_by('starts_with', 'name')
         return queryset
+    
     @swagger_auto_schema(
             query_serializer=WordValidationSerializer,
             responses={200: GetIngredientDataSerializer}
@@ -37,9 +57,10 @@ class GetIngredientDataViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSe
     def list(self, request):
         queryset = self.get_queryset()
         name_list = list(queryset.values_list('name', flat=True))
+        serializer = self.get_serializer(name_list)
 
         return Response({
-            "nameList": name_list
+            "nameList": serializer.data
         }, status=200)
 
 
