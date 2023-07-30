@@ -2,15 +2,27 @@ from rest_framework import serializers
 
 from .models import Ingredients_Youtube
 from youtube.models import YouTube
-from .models import Ingredients
+from .models import CategoryIngredients,Ingredients
+
+
+class GetCategoryIngredientSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='name')
+    ingredientNameList = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CategoryIngredients
+        fields = ['category_name', 'ingredientNameList']
+
+    def get_ingredientNameList(self, obj) -> list:
+        return obj.category_ingredients.values_list('name', flat=True)
+
+
+class GetIngredientDataSerializer(serializers.Serializer):
+    nameList = serializers.ListField(child=serializers.CharField(), help_text="재료 리스트")
 
 
 class WordValidationSerializer(serializers.Serializer):
     word = serializers.CharField(help_text="단어로 검색")
-
-
-class GetIngredientDataSerializer(serializers.Serializer):
-    name = serializers.ListField(child=serializers.CharField(), help_text="재료 리스트")
 
 
 class GetYouTubeFromIngredientSerializer(serializers.ModelSerializer):
