@@ -56,12 +56,10 @@ class GetIngredientDataViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     )
     def list(self, request):
         queryset = self.get_queryset()
-        name_list = list(queryset.values_list('name', flat=True))
-        serializer = self.get_serializer(name_list)
+        data={'nameList': list(queryset.values_list('name', flat=True))}
+        serializer = self.get_serializer(data)
 
-        return Response({
-            "nameList": serializer.data
-        }, status=200)
+        return Response(serializer.data, status=200)
 
 
 class GetYouTubeFromIngredientViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -79,10 +77,6 @@ class GetYouTubeFromIngredientViewSet(mixins.ListModelMixin, viewsets.GenericVie
             num_references=Count('ingredients')
         ).order_by('-num_references')
 
-        for obj in queryset:
-            if obj.num_references > 0:
-                print(obj.id)
-                
         return queryset
     
     @swagger_auto_schema(
