@@ -69,7 +69,7 @@ class GetYouTubeFromIngredientViewSet(mixins.ListModelMixin, viewsets.GenericVie
     def get_queryset(self):
         serializer = GetIngredientDataSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
-        ingredient_name_list = serializer.validated_data['nameList']
+        ingredient_name_list = serializer.validated_data['nameList'][0].split(',')
 
         queryset = YouTube.objects.prefetch_related('ingredients').filter(
             ingredients__name__in=ingredient_name_list
