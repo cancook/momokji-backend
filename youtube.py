@@ -21,18 +21,21 @@ class YouTubes():
         YOUTUBE_API_VERSION='v3'
         self.youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=DEVELOPER_KEY)
 
-    def paik_jong_won_ingredients(self):
+    def ingredients(self, channel_name):
         ingredient_dict = {}
         ingredient_list = []
         target_description = None
 
-        objs = YouTube.objects.filter(channel_id="UCyn-K7rZLXjGl7VXGweIlcA").values_list('url_pk', 'description')
+        if channel_name == '백종원':
+            objs = YouTube.objects.filter(channel_id="UCyn-K7rZLXjGl7VXGweIlcA").values_list('url_pk', 'description')
+        elif channel_name == '자취요리신':
+            objs = YouTube.objects.filter(channel_id="UCC9pQY_uaBSa0WOpMNJHbEQ").values_list('url_pk', 'description')
 
         for obj in objs:
             description = obj[1].split("\n")
             url_pk = obj[0]
             for ingredient in description:
-                if '[ 재료 ]' in ingredient:
+                if '[ 재료 ]' in ingredient or '[재료]' in ingredient:
                     target_description = ingredient
                     if target_description:
                         index = description.index(target_description)
@@ -43,26 +46,35 @@ class YouTubes():
                                 break
                             if description[i].startswith('[ 만드는 법 ]'):
                                 break
+                            if description[i].startswith('[만드는 법]'):
+                                break
                             if description[i].startswith('*'):
                                 break
                             if description[i] == '*':
                                 break
 
-                            ingredient = re.sub(r'[|[a-zA-Z]|[0-9]|[약컵큰술개병/()½¼¾~ .]|]', '', description[i])
+                            ingredient = re.sub(r'[|[a-zA-Z]|[0-9]|[약컵큰술개병스푼선택재료각종봉/()½¼¾~ .]|]', '', description[i])
+
                             if (len(ingredient) > 2 and ingredient[-1] == '과') or (len(ingredient) > 2 and ingredient[-1] == '대') or (len(ingredient) > 3 and ingredient[-1] == '간'):
                                 ingredient = re.sub(r'.$', '', ingredient)
                             if (len(ingredient) > 3 and ingredient[-1] == '장') or (len(ingredient) > 3 and ingredient[-1] == '와'):
                                 ingredient = re.sub(r'(장|와)$', '', ingredient)
 
-                            ingredient_dict = dict(url_pk=url_pk, name=ingredient)
-                            ingredient_list.append(ingredient_dict)
+                            if channel_name == '자취요리신':
+                                ingredient = ingredient.split(',')
+                                for i in ingredient:
+                                    ingredient_dict = dict(url_pk=url_pk, name=i)
+                                    ingredient_list.append(ingredient_dict)
+                            else:
+                                ingredient_dict = dict(url_pk=url_pk, name=ingredient)
+                                ingredient_list.append(ingredient_dict)
             else:
                 pass
         
         #* 1. 검증 된 재료데이터(ingredient_list) 를 가져와서 Ingredient Model 에 저장한다.
         obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
         try:
-            Ingredients.objects.bulk_create(obj_list)
+            Ingredients.objects.bulk_create(obj_list, ignore_conflicts=True)
         except IntegrityError:
             pass
 
@@ -205,7 +217,8 @@ class YouTubes():
                 break
 
         df=pd.DataFrame(stats_list)
-        df.to_csv("/home/ubuntu/code/cancook-backend/csv/자취요리신.csv", index=False)
+        # df.to_csv("/home/ubuntu/code/cancook-backend/csv/자취요리신.csv", index=False)
+        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/자취요리신.csv", index=False)
 
         obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
         try:
@@ -228,14 +241,15 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='you must choose 백종원 and 자취요리신')
     parser.add_argument('-c', '--channel')
-    parser.add_argument('-i', '--ingredients')
     args = parser.parse_args()
 
     y = YouTubes()
 
     if args.channel == '백종원':
         y.paik_jong_won()
-    elif args.channel == '백종원재료':
-        y.paik_jong_won_ingredients()
     elif args.channel == '자취요리신':
         y.simple_cooking()
+    elif args.channel == '백종원_재료':
+        y.ingredients(channel_name='백종원')
+    elif args.channel == '자취요리신_재료':
+        y.ingredients(channel_name='자취요리신')
