@@ -40,6 +40,7 @@ class YouTubes():
                     if target_description:
                         index = description.index(target_description)
                         for i in range(index+1, len(description)):
+                            #! description 의 내부 로직을 들면서 특정 문자열이 나온다면 break 해서 재료 데이터만 추출
                             if description[i] == '':
                                 break
                             if description[i].startswith('['):
@@ -52,14 +53,38 @@ class YouTubes():
                                 break
                             if description[i] == '*':
                                 break
-
-                            ingredient = re.sub(r'[|[a-zA-Z]|[0-9]|[약컵큰술개병스푼선택재료각종봉/()½¼¾~ .]|]', '', description[i])
+                            
+                            #! 위에서 재료 데이터를 1차 필터링을 했다면, 재료 데이터에 불필요한 재료 데이터가 들어가 있다면 2차 필터링
+                            ingredient = re.sub(r'[|[a-zA-Z]|[0-9]|[약컵큰술개병스푼선택재료각종봉뚜껑있는팩/()+½¼¾~ .-]|]', '', description[i])
+                            if '없으면' in ingredient:
+                                ingredient = re.sub(r'없으면', '', ingredient)
+                            if '생략가능' in ingredient:
+                                ingredient = re.sub(r'생략가능', '', ingredient)
+                            if '사이즈는일반이입니다' in ingredient:
+                                ingredient = re.sub(r'사이즈는일반이입니다', '', ingredient)
+                            if '포기' in ingredient:
+                                ingredient = re.sub(r'포기', '', ingredient)
+                            if '용기' in ingredient:
+                                ingredient = re.sub(r'용기', '', ingredient)
+                            if '공기' in ingredient:
+                                ingredient = re.sub(r'공기', '', ingredient)
+                            if '갈아만든배음' in ingredient:
+                                ingredient = re.sub(r'갈아만든배음', '', ingredient)
+                            if '한줌' in ingredient:
+                                ingredient = re.sub(r'한줌', '', ingredient)
+                            if '-액젓아무거나' in ingredient:
+                                ingredient = re.sub(r'-액젓아무거나', '', ingredient)
+                            if '혹은' in ingredient:
+                                ingredient = re.sub(r'혹은', '', ingredient)
+                            if '전자레인지용기' in ingredient:
+                                ingredient = re.sub(r'전자레인지용기', '', ingredient)
 
                             if (len(ingredient) > 2 and ingredient[-1] == '과') or (len(ingredient) > 2 and ingredient[-1] == '대') or (len(ingredient) > 3 and ingredient[-1] == '간'):
                                 ingredient = re.sub(r'.$', '', ingredient)
                             if (len(ingredient) > 3 and ingredient[-1] == '장') or (len(ingredient) > 3 and ingredient[-1] == '와'):
                                 ingredient = re.sub(r'(장|와)$', '', ingredient)
 
+                            #! '자취요리신'의 경우엔 재료 정보가 줄 바꿈 없이 문자열 "두부, 순두부, 김치" 이런식으로 되어 있기 때문에 list 형태로 변경하고 for문으로 재료 데이터 추출
                             if channel_name == '자취요리신':
                                 ingredient = ingredient.split(',')
                                 for i in ingredient:
