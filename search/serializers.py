@@ -6,12 +6,12 @@ from .models import CategoryIngredients,Ingredients
 
 
 class GetCategoryIngredientSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='name')
+    categoryName = serializers.CharField(source='name')
     ingredientNameList = serializers.SerializerMethodField()
 
     class Meta:
         model = CategoryIngredients
-        fields = ['category_name', 'ingredientNameList']
+        fields = ['categoryName', 'ingredientNameList']
 
     def get_ingredientNameList(self, obj) -> list:
         return obj.category_ingredients.values_list('name', flat=True)
