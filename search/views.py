@@ -41,7 +41,7 @@ class GetIngredientDataViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         word = serializer.validated_data['word']
 
         if word:
-            queryset = queryset.filter(name__icontains=word).annotate(
+            queryset = queryset.filter(name__icontains=word).exclude(category_id=None).annotate(
                 starts_with=Case(
                     When(name__istartswith=word, then=0),
                     default=1,
