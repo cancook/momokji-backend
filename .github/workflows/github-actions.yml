@@ -1,0 +1,22 @@
+name: AWS EC2 Automated Deployment
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: excuting remote ssh commands
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.REMOTE_IP }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_PRIVATE_KEY }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
+          script: |
+            cd /home/ubuntu/code/self-dining-backend
+            git pull origin main
+            sudo systemctl restart gunicorn
