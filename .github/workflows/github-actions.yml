@@ -17,6 +17,7 @@ jobs:
           key: ${{ secrets.REMOTE_PRIVATE_KEY }}
           port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
+            whoami
             cd /home/ubuntu/code/self-dining-backend
             git pull origin main
             sudo systemctl restart gunicorn
