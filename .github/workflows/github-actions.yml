@@ -15,7 +15,7 @@ jobs:
           host: ${{ secrets.REMOTE_IP }}
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.REMOTE_PRIVATE_KEY }}
-          # port: ${{ secrets.REMOTE_SSH_PORT }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
             cd /home/ubuntu/code/self-dining-backend
             git pull origin main
