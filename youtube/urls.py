@@ -5,6 +5,7 @@ from . import views
 app_name = 'youtube'
 
 router = DefaultRouter()
+router.register('detail', views.YouTubeDetailViewSet, basename='detail')
 router.register('recommended-list', views.RecommendedYouTubeViewSet, basename='recommended')
 router.register('category-list', views.CategoryViewSet, basename='category')
 

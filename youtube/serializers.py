@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Creator, YouTube, Category
+from search.models import Ingredients
 
 class CreatorSerializer(serializers.ModelSerializer):
     thumbnail = serializers.CharField(source='thumbnail_url')
@@ -51,3 +52,18 @@ class CategoryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['title', 'data']
+
+    
+class YouTubeDetailSerializer(serializers.ModelSerializer):
+    urlPk = serializers.CharField(source='url_pk')
+    views = serializers.IntegerField(source='view_count')
+    createdAt = serializers.DateTimeField(source='published')
+    ingredients = serializers.SerializerMethodField()
+
+    class Meta:
+        model = YouTube
+        fields = ['urlPk', 'title', 'description', 'ingredients', 'views', 'createdAt']
+
+    def get_ingredients(self, obj):
+        result = obj.ingredients.values_list('name', flat=True)
+        return result
