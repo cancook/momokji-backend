@@ -173,7 +173,7 @@ class YouTubes():
                 channel_id=video['snippet']['channelId'] # 'UCyn-K7rZLXjGl7VXGweIlcA'
                 title=video['snippet']['title']
                 description=video['snippet']['description']
-                thumbnails=video['snippet']['thumbnails']['high']
+                thumbnails=video['snippet']['thumbnails']['high']['url']
                 view_count=video['statistics'].get('viewCount',0)
                 like_count=video['statistics'].get('likeCount',0)
                 published=video['snippet']['publishedAt']
@@ -182,10 +182,11 @@ class YouTubes():
                 stats_list.append(stats_dict)
         df=pd.DataFrame(stats_list)
         df.to_csv("/home/ubuntu/code/cancook-backend/csv/백종원_쿠킹로그.csv", index=False)
+        # df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/백종원_쿠킹로그.csv", index=False)
 
         obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
         try:
-            YouTube.objects.bulk_create(obj_list, ignore_conflicts=True)
+            YouTube.objects.bulk_update(objs=obj_list, fields=['thumbnails'])
             count = YouTube.objects.filter(channel_id='UCyn-K7rZLXjGl7VXGweIlcA').count()
             client.chat_postMessage(
                 channel="youtube",
@@ -228,7 +229,7 @@ class YouTubes():
                 channel_id=video['snippet']['channelId'] # 'UCC9pQY_uaBSa0WOpMNJHbEQ'
                 title=video['snippet']['title']
                 description=video['snippet']['description']
-                thumbnails=video['snippet']['thumbnails']['high']
+                thumbnails=video['snippet']['thumbnails']['high']['url']
                 view_count=video['statistics'].get('viewCount',0)
                 like_count=video['statistics'].get('likeCount',0)
                 published=video['snippet']['publishedAt']
@@ -242,12 +243,12 @@ class YouTubes():
                 break
 
         df=pd.DataFrame(stats_list)
-        # df.to_csv("/home/ubuntu/code/cancook-backend/csv/자취요리신.csv", index=False)
-        df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/자취요리신.csv", index=False)
+        df.to_csv("/home/ubuntu/code/cancook-backend/csv/자취요리신.csv", index=False)
+        # df.to_csv("/Users/cslee/vscode/self-dining-backend/csv/자취요리신.csv", index=False)
 
         obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
         try:
-            YouTube.objects.bulk_create(obj_list, ignore_conflicts=True)
+            YouTube.objects.bulk_update(objs=obj_list, fields=['thumbnails'])
             count = YouTube.objects.filter(channel_id='UCC9pQY_uaBSa0WOpMNJHbEQ').count()
             client.chat_postMessage(
                 channel="youtube",
