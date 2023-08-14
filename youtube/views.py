@@ -37,7 +37,7 @@ class CategoryViewSet(mixins.ListModelMixin,
 class YouTubeDetailViewSet(mixins.RetrieveModelMixin,
                            viewsets.GenericViewSet):
     
-    model = YouTube
+    queryset = YouTube.objects.all()
     serializer_class = YouTubeDetailSerializer
 
     def get_object(self):
