@@ -19,7 +19,7 @@ class Creator(models.Model):
 
 
 class YouTube(models.Model):
-    url_pk = models.CharField(primary_key=True, unique=True, max_length=64)
+    url_pk = models.CharField(unique=True, max_length=64)
     channel_id = models.CharField(max_length=64)
     creator = models.ForeignKey(Creator, on_delete=models.CASCADE, null=True, default=None)
     title = models.CharField(max_length=255)
