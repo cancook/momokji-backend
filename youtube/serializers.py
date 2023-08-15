@@ -67,3 +67,10 @@ class YouTubeDetailSerializer(serializers.ModelSerializer):
     def get_ingredients(self, obj):
         result = obj.ingredients.values_list('name', flat=True)
         return result
+    
+
+class YouTubeCreatorSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Creator
+        fields = '__all__'

@@ -6,8 +6,8 @@ from rest_framework import viewsets, mixins
 
 from drf_yasg.utils import swagger_auto_schema
 
-from .models import YouTube, Category
-from .serializers import RecommendedYouTubeSerializer, CategoryListSerializer, YouTubeDetailSerializer
+from .models import YouTube, Category, Creator
+from .serializers import RecommendedYouTubeSerializer, CategoryListSerializer, YouTubeDetailSerializer, YouTubeCreatorSerializer
 
 class HealthCheck(APIView):
     def get(self, request):
@@ -49,3 +49,10 @@ class YouTubeDetailViewSet(mixins.RetrieveModelMixin,
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+
+class YouTubeCreatorViewSet(mixins.ListModelMixin,
+                            viewsets.GenericViewSet):
+      
+      queryset = Creator.objects.all()
+      serializer_class = YouTubeCreatorSerializer
