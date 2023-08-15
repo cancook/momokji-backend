@@ -12,7 +12,7 @@ class BaseModel(models.Model):
 class Creator(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    thumbnail_url = models.CharField(max_length=64)
+    thumbnail_url = models.URLField(max_length=255)
 
     class Meta:
         db_table = 'youtube_creator'
