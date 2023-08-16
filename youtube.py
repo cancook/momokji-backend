@@ -186,7 +186,7 @@ class YouTubes():
 
         obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
         try:
-            YouTube.objects.bulk_update(objs=obj_list, fields=['thumbnails'])
+            YouTube.objects.bulk_create(objs=obj_list)
             count = YouTube.objects.filter(channel_id='UCyn-K7rZLXjGl7VXGweIlcA').count()
             client.chat_postMessage(
                 channel="youtube",
@@ -248,7 +248,7 @@ class YouTubes():
 
         obj_list = [YouTube(**data) for data in stats_list] # YouTube(**data) YouTube Object = ORM
         try:
-            YouTube.objects.bulk_update(objs=obj_list, fields=['thumbnails'])
+            YouTube.objects.bulk_create(objs=obj_list)
             count = YouTube.objects.filter(channel_id='UCC9pQY_uaBSa0WOpMNJHbEQ').count()
             client.chat_postMessage(
                 channel="youtube",
