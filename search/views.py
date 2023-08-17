@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Case, When, Count
+from django.db.models import Case, When, Count, Q
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -41,9 +41,10 @@ class GetIngredientDataViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         word = serializer.validated_data['word']
 
         if word:
-            queryset = queryset.filter(name__icontains=word).exclude(category_id=None).annotate(
+            queryset = queryset.filter(name__icontains=word).annotate(
                 starts_with=Case(
-                    When(name__istartswith=word, then=0),
+                    When(is_valid=True, category_id=True, then=0),
+                    When(aligned_name__icontains=word, then=0),
                     default=1,
                     output_field=models.IntegerField(),
                 )
@@ -56,7 +57,13 @@ class GetIngredientDataViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     )
     def list(self, request):
         queryset = self.get_queryset()
-        data={'nameList': list(queryset.values_list('name', flat=True))}
+        lst = []
+        for q in queryset:
+            if q.starts_with == 0 and q.aligned_name:
+                lst.append(q.aligned_name)
+            else:
+                lst.append(q.name)
+        data={'nameList': lst}
         serializer = self.get_serializer(data)
 
         return Response(serializer.data, status=200)
