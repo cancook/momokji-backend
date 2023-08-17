@@ -97,7 +97,7 @@ class YouTubes():
                 pass
         
         #* 1. 검증 된 재료데이터(ingredient_list) 를 가져와서 Ingredient Model 에 저장한다.
-        obj_list = [Ingredients(name=info['name'], is_valid=True) for info in ingredient_list]
+        obj_list = [Ingredients(name=info['name'], is_valid=False) for info in ingredient_list]
         try:
             Ingredients.objects.bulk_create(obj_list, ignore_conflicts=True)
         except IntegrityError:
