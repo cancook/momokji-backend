@@ -8,6 +8,7 @@ from rest_framework.filters import OrderingFilter
 from drf_yasg.utils import swagger_auto_schema
 
 from youtube.models import YouTube
+from .filters import CustomOrderingFilter
 from .models import CategoryIngredients, Ingredients, Ingredients_Youtube
 from .serializers import GetCategoryIngredientSerializer, GetIngredientDataSerializer, GetYouTubeFromIngredientSerializer, WordValidationSerializer
 
@@ -72,7 +73,7 @@ class GetYouTubeFromIngredientViewSet(mixins.ListModelMixin, viewsets.GenericVie
     queryset = YouTube.objects.all()
     serializer_class = GetYouTubeFromIngredientSerializer
 
-    filter_backends = [OrderingFilter]
+    filter_backends = [CustomOrderingFilter]
 
     ordering_fields = ['view_count', 'published']
 
