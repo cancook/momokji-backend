@@ -18,7 +18,7 @@ class GetCategoryIngredientViewSet(mixins.ListModelMixin, viewsets.GenericViewSe
 
     def get_queryset(self):
         queryset = CategoryIngredients.objects.prefetch_related('category_ingredients').all()
-        return queryset
+        return queryset.order_by('sequence')
     
     @swagger_auto_schema(
             responses={200: GetCategoryIngredientSerializer(many=True)}

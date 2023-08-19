@@ -3,7 +3,8 @@ from youtube.models import BaseModel, YouTube
 
 
 class CategoryIngredients(models.Model):
-    name = models.CharField(unique=True, max_length=32)
+    name = models.CharField(max_length=32)
+    sequence = models.IntegerField(default=0)
 
     class Meta:
         db_table = "search_category_ingredients"
