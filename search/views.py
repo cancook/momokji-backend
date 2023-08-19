@@ -2,10 +2,9 @@ from django.db import models
 from django.db.models import Case, When, Count, Q
 
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, generics
+from rest_framework.filters import OrderingFilter
 
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 from youtube.models import YouTube
@@ -70,8 +69,12 @@ class GetIngredientDataViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class GetYouTubeFromIngredientViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Ingredients.objects.all()
+    queryset = YouTube.objects.all()
     serializer_class = GetYouTubeFromIngredientSerializer
+
+    filter_backends = [OrderingFilter]
+
+    ordering_fields = ['view_count', 'published']
 
     def get_queryset(self):
         serializer = GetIngredientDataSerializer(data=self.request.query_params)
@@ -83,6 +86,8 @@ class GetYouTubeFromIngredientViewSet(mixins.ListModelMixin, viewsets.GenericVie
         ).annotate(
             num_references=Count('ingredients')
         ).order_by('-num_references')
+
+        queryset = self.filter_queryset(queryset)
 
         return queryset
     
