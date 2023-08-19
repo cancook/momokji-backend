@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from youtube.models import YouTube
-from .models import CategoryIngredients, Ingredients
+from .models import CategoryIngredients
 
 
 class GetCategoryIngredientSerializer(serializers.ModelSerializer):
@@ -30,7 +30,6 @@ class GetYouTubeFromIngredientSerializer(serializers.ModelSerializer):
     views = serializers.IntegerField(source='view_count')
     link = serializers.SerializerMethodField()
     createdAt = serializers.DateTimeField(source='published')
-    link = serializers.SerializerMethodField()
 
     class Meta:
         model = YouTube

@@ -46,6 +46,7 @@ class YoutubeAndCreatorSeiralizer(serializers.ModelSerializer):
         model = YouTube
         fields = ['video', 'creator']
 
+
 class CategoryListSerializer(serializers.ModelSerializer):
     data = YoutubeAndCreatorSeiralizer(many=True, source='youtube_set')
 
