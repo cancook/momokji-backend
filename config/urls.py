@@ -1,11 +1,13 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
 
 from config.settings import base
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg       import openapi
+
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -17,11 +19,10 @@ schema_view = get_schema_view(
         license=openapi.License(name="mit"),
     ),
     url='https://self-dining.shop/api/',
+    # url='http://127.0.0.1:8000/api/',
     public=True,
     permission_classes=[permissions.AllowAny],
 )
-
-from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),

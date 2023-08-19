@@ -9,9 +9,11 @@ from drf_yasg.utils import swagger_auto_schema
 from .models import YouTube, Category, Creator
 from .serializers import RecommendedYouTubeSerializer, CategoryListSerializer, YouTubeDetailSerializer, YouTubeCreatorSerializer
 
+
 class HealthCheck(APIView):
     def get(self, request):
         return Response(True)
+
 
 class RecommendedYouTubeViewSet(mixins.ListModelMixin,
                                 viewsets.GenericViewSet):
@@ -23,9 +25,7 @@ class RecommendedYouTubeViewSet(mixins.ListModelMixin,
         return queryset
     
 
-
-class CategoryViewSet(mixins.ListModelMixin,
-                        viewsets.GenericViewSet):
+class CategoryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = CategoryListSerializer
 
     def get_queryset(self):
@@ -51,8 +51,7 @@ class YouTubeDetailViewSet(mixins.RetrieveModelMixin,
         return Response(serializer.data)
 
 
-class YouTubeCreatorViewSet(mixins.ListModelMixin,
-                            viewsets.GenericViewSet):
+class YouTubeCreatorViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
       
-      queryset = Creator.objects.all()
-      serializer_class = YouTubeCreatorSerializer
+    queryset = Creator.objects.all()
+    serializer_class = YouTubeCreatorSerializer
