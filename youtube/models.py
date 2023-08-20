@@ -17,6 +17,9 @@ class Creator(models.Model):
     class Meta:
         db_table = 'youtube_creator'
 
+    def __str__(self):
+        return f"{self.name}"
+
 
 class YouTube(models.Model):
     url_pk = models.CharField(unique=True, max_length=64)
@@ -38,6 +41,9 @@ class YouTube(models.Model):
                 name='url_pk')
         ]
 
+    def __str__(self):
+        return f"{self.url_pk}"
+
 
 class YouTubeIngredients(models.Model):
     youtube = models.ForeignKey(YouTube, on_delete=models.CASCADE)
@@ -51,13 +57,13 @@ class YouTubeIngredients(models.Model):
 class Category(BaseModel):
     category_id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=128)
-    youtube = models.ManyToManyField(YouTube, through="Category_Youtube")
+    youtube = models.ManyToManyField(YouTube, through="Category_Youtube", related_name='youtube')
 
     class Meta:
         db_table = 'category'
 
-    def __init__(self, *args, **kwargs):
-        return f"{self.category_id}의 {self.title}"
+    def __str__(self, *args, **kwargs):
+        return f"{self.title}"
 
 
 # Category_Youtube 중간 테이블(중간에 따로 넣어야 할 데이터가 필요하면 생성... 뭐가 있으려나)
