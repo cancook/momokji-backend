@@ -1,6 +1,9 @@
+import json
+
 from rest_framework import serializers
 
-from youtube.models import YouTube
+from youtube.models import YouTube, Creator
+from youtube.serializers import YouTubeSerializer, CreatorSerializer
 from .models import CategoryIngredients
 
 
@@ -13,6 +16,15 @@ class GetCategoryIngredientSerializer(serializers.ModelSerializer):
         fields = ['sequence', 'categoryName', 'ingredientNameList']
 
     def get_ingredientNameList(self, obj) -> list:
+        # TODO obj 에 아래의 제약조건이 없어 '찌용돼지고기'가 나오고 있다.
+        # queryset = queryset.filter(name__icontains=word).exclude(is_valid=False).annotate(
+        #                 starts_with=Case(
+        #                     When(is_valid=True, category_id=True, then=0),
+        #                     When(aligned_name__icontains=word, then=0),
+        #                     default=1,
+        #                     output_field=models.IntegerField(),
+        #                 )
+        #             ).order_by('starts_with', 'name')
         return obj.category_ingredients.values_list('name', flat=True)
 
 
@@ -25,15 +37,13 @@ class WordValidationSerializer(serializers.Serializer):
 
 
 class GetYouTubeFromIngredientSerializer(serializers.ModelSerializer):
-    thumbnailURL = serializers.CharField(source='thumbnails')
-    playTime = serializers.CharField(source='play_time')
-    views = serializers.IntegerField(source='view_count')
-    link = serializers.SerializerMethodField()
-    createdAt = serializers.DateTimeField(source='published')
+    video = YouTubeSerializer(source='*')
+    creator = CreatorSerializer()
+    ingredients = serializers.SerializerMethodField()
 
     class Meta:
         model = YouTube
-        fields = ['id', 'title', 'thumbnailURL', 'playTime', 'views', 'link', 'createdAt']
+        fields = ['video', 'creator', 'ingredients']
 
-    def get_link(self, obj):
-        return 'https://www.youtube.com/watch?v=' + obj.url_pk
+    def get_ingredients(self, obj):
+        return obj.ingredients.values_list('name', flat=True)
