@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Creator, YouTube, Category
 from search.models import Ingredients
 
+
 class CreatorSerializer(serializers.ModelSerializer):
     thumbnail = serializers.CharField(source='thumbnail_url')
 
@@ -38,7 +39,7 @@ class RecommendedYouTubeSerializer(serializers.ModelSerializer):
         return 'https://www.youtube.com/watch?v=' + obj.url_pk
 
 
-class YoutubeAndCreatorSeiralizer(serializers.ModelSerializer):
+class YoutubeAndCreatorSerializer(serializers.ModelSerializer):
     video = YouTubeSerializer(source='*')
     creator = CreatorSerializer()
 
@@ -48,11 +49,11 @@ class YoutubeAndCreatorSeiralizer(serializers.ModelSerializer):
 
 
 class CategoryListSerializer(serializers.ModelSerializer):
-    data = YoutubeAndCreatorSeiralizer(many=True, source='youtube_set')
+    data = YoutubeAndCreatorSerializer(many=True, source='youtube')
 
     class Meta:
         model = Category
-        fields = ['title', 'data']
+        fields = ['category_id', 'title', 'data']
 
     
 class YouTubeDetailSerializer(serializers.ModelSerializer):
