@@ -25,7 +25,8 @@ class GetCategoryIngredientSerializer(serializers.ModelSerializer):
         #                     output_field=models.IntegerField(),
         #                 )
         #             ).order_by('starts_with', 'name')
-        return obj.category_ingredients.values_list('name', flat=True)
+        return obj.category_ingredients.exclude(aligned_name__isnull=False).values_list('name', flat=True)
+        # return obj.category_ingredients.values_list('name', flat=True)
 
 
 class GetIngredientDataSerializer(serializers.Serializer):
