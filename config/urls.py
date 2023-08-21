@@ -18,7 +18,7 @@ schema_view = get_schema_view(
         contact=openapi.Contact(email="chinup1004@naver.com"),
         license=openapi.License(name="mit"),
     ),
-    url='https://self-dining.shop/api/',
+    url='https://momokji.shop/api/',
     # url='http://127.0.0.1:8000/api/',
     public=True,
     permission_classes=[permissions.AllowAny],
