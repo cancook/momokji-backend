@@ -29,8 +29,7 @@ class CategoryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = CategoryListSerializer
 
     def get_queryset(self):
-        queryset = Category.objects.prefetch_related('youtube').all()
-        shuffle(queryset)
+        queryset = Category.objects.prefetch_related('youtube').all().order_by('?')
         return queryset
     
 
