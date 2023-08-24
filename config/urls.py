@@ -12,7 +12,7 @@ from drf_yasg       import openapi
 schema_view = get_schema_view(
     openapi.Info(
         title="momokji",
-        default_version='0.1',
+        default_version='1.0',
         description="momokji API 문서",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="chinup1004@naver.com"),
