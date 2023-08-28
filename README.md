@@ -14,32 +14,32 @@
 
 ### google-api-python-client
 
-1. *Python 으로 YouTube Data 를 가져왔습니다.*
++ *Python 으로 YouTube Data 를 가져왔습니다.*
 
 ### djangorestframework
 
-1. *RESTful API*
++ *RESTful API*
 
 ### drf-yasg
 
-1. *Swagger 사용*
++ *Swagger 사용*
 
 ### pandas
 
-1. *google-api-python-client 로 가져온 데이터를 csv 파일로 저장했습니다.*
++ *google-api-python-client 로 가져온 데이터를 csv 파일로 저장했습니다.*
 
 ### slack-sdk
 
-1. *google-api-python-client 로 가져온 데이터의 갯 수를 slack 으로 전송하여 상태 체크*
++ *google-api-python-client 로 가져온 데이터의 갯 수를 slack 으로 전송하여 상태 체크*
 
 ### Nginx
 
-1. *웹 서버*
++ *웹 서버*
 
 ### gunicorn
 
-1. *WSGI(web server gateway interface)*
++ *WSGI(web server gateway interface)*
 
 ### letsencrypt
 
-1. *SSL 인증서*
++ *SSL 인증서*
