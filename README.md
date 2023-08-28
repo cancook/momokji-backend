@@ -32,7 +32,7 @@
 
 + *google-api-python-client 로 가져온 데이터의 갯 수를 slack 으로 전송하여 상태 체크*
 
-### Nginx
+### nginx
 
 + *웹 서버*
 
