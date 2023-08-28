@@ -14,16 +14,32 @@
 
 ### google-api-python-client
 
+> Python 으로 YouTube Data 를 가져왔습니다.
+
 ### djangorestframework
+
+> RESTful API
 
 ### drf-yasg
 
+> Swagger 사용
+
 ### pandas
+
+> google-api-python-client 로 가져온 데이터를 csv 파일로 저장했습니다.
 
 ### slack-sdk
 
+> google-api-python-client 로 가져온 데이터의 갯 수를 slack 으로 전송하여 상태 체크
+
 ### Nginx
+
+> 웹 서버
 
 ### gunicorn
 
+> WSGI(web server gateway interface)
+
 ### letsencrypt
+
+> SSL 인증서
