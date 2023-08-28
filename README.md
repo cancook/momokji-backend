@@ -10,26 +10,20 @@
   <img src="https://img.shields.io/badge/gunicorn-499848?style=for-the-badge&logo=gunicorn&logoColor=white"> 
 </div> 
 
-# Introduction
-## Main features
+## Usage
 
-# Usage
-## AWS EC2 and RDS and S3
+### google-api-python-client
 
-## google-api-python-client
+### djangorestframework
 
-## djangorestframework
+### drf-yasg
 
-## drf-yasg
+### pandas
 
-## pandas
+### slack-sdk
 
-## slack-sdk
+### Nginx
 
-## gunicorn
+### gunicorn
 
-## Nginx
-
-## letsencrypt
-
-Github Action
+### letsencrypt
